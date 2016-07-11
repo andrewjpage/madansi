@@ -1,0 +1,24 @@
+import os
+import glob
+from setuptools import setup, find_packages
+
+setup(
+	name= 'madansi',
+	version= '1.0.1',
+	description= '',
+	packages = find_packages(),
+	author = 'Joanna Tumelty',
+	author_email= 'jt20@sanger.ac.uk',
+	url='https://github.com/JTumelty/madansi',
+	scripts=glob.glob('scripts/*'),
+	test_suite='nose.collector',
+	tests_require=['nose >= 1.3', 'mock'],
+	license='GPLv3',
+	classifiers=[
+	        "License :: OSI Approved :: GNU General Public License (GPLv3)",
+	        "Programming Language :: Python",
+	        "Development Status :: 4 - Beta",
+	        "Intended Audience :: Science/Research",
+	        "Topic :: Scientific/Engineering :: Bio-Informatics",
+	        ],	
+	)
