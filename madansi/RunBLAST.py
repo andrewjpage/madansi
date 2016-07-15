@@ -3,7 +3,7 @@ from Bio.Blast.Applications import NcbiblastnCommandline
 import os
 
 class RunBLAST(object):
-    def __init__(self,inputreference,outputreference, outputdatabase, queryfile, finaloutput, evalue = 1e-20):
+    def __init__(self,inputreference,outputreference, outputdatabase, queryfile, finaloutput, evalue = 0.01):
         self.inputreference = inputreference
         self.outputreference = outputreference
         self.outputdatabase = outputdatabase
@@ -24,7 +24,4 @@ class RunBLAST(object):
     def run_BLAST(self):
         """Run BLAST with the query file and the modified reference fasta file"""
         blastn_cline = NcbiblastnCommandline(query = self.queryfile, db= self.outputdatabase, outfmt=6, out=self.finaloutput, task ='blastn', evalue= self.evalue)
-        print(" ".join([self.queryfile, self.outputdatabase, self.finaloutput]))
         stdout, stderr = blastn_cline()
-        print(stdout)
-        print(stderr)
