@@ -11,11 +11,13 @@ class TestGraphs(unittest.TestCase):
     
     def test_open_graph(self):
         """Tests that the dot file can be opened for reading"""
-        g=Graphs('madansi/tests/data/graph_3_nodes.dot')
+        g=Graphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/expected_filter')
         g.open_graph()
         self.assertTrue(g)
         
         #Also test if given the wrong format for a graph or if the graph file does not exist
         
-    def test_comparison_graph_lookuptable(self):
-        pass
+    def test_comparison_graph_lookup_table(self):
+        cglt = Graphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/expected_filter')
+        cglt.comparison_graph_lookup_table()
+        self.assertTrue()
