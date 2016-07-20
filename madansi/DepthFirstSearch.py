@@ -4,7 +4,7 @@ from madansi.BlastHit import BlastHit
 from madansi.GenePresent import GenePresent
 
 class Error(Exception): pass
-class WalkGraphs(object):
+class DepthFirstSearch(object):
     """Given a node on the given graph, will check that the gene that it represents is present from the lookup table and considers its neighbours to see if they are also present."""    
     def __init__(self,graphfile,filteredfile):
         self.graphfile = graphfile
@@ -39,7 +39,7 @@ class WalkGraphs(object):
                 break
         return start_gene
     
-    def walk_graph(self):
+    def depth_first_search(self):
         """Modification to the networkx function dfs_edges to search the graph whilst considering whether the vertices """
         g = self.add_node_attribute()
         
@@ -65,7 +65,6 @@ class WalkGraphs(object):
                         stack.append((child,iter(h[child])))
                 except StopIteration:
                     stack.pop()
-        print(list_dfs)
         return list_dfs
                 
     def remove_added_edge_node_attributes(self):
