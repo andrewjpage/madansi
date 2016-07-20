@@ -12,11 +12,11 @@ class TestGenePresent(unittest.TestCase):
         identifies the presence of some genes and the lack of presence of others"""
         gp = GenePresent('madansi/tests/data/gene_present_unittest')
         gene_present_dict = gp.construct_dictionary()
-        expected_dict = {'Contig2':False, 'Contig3':True, '7.23.B265.14.cap3_contig':True , '7.23.B265.9.cap3_contig':False}
+        expected_dict = {'Contig2':True, 'Contig3':True, 'Contig1':True , 'Contig4':False}
         self.assertDictEqual(gene_present_dict, expected_dict)
 
-        self.assertEqual(True, gene_present_dict['7.23.B265.14.cap3_contig'])
-        self.assertEqual(gene_present_dict['Contig2'], False)
+        self.assertEqual(True, gene_present_dict['Contig1'])
+        self.assertEqual(gene_present_dict['Contig4'], False)
 
     def test_list_genes_present(self):
         """Tests the list of genes present generated from the dictionary"""
