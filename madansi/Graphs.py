@@ -40,12 +40,10 @@ class Graphs(object):
         gene_dict = self.construct_dictionary()
         extra_genes=[]
         for gene in nx.nodes_iter(g):
-            if gene in gene_dict:
-                if not gene_dict[gene]:
-                    extra_genes.append(gene)
+            if not gene_dict[gene]:
+                extra_genes.append(gene)
         return extra_genes
 
-    
     def genes_not_in_graph(self):
         """Finds the genes listed in the lookup table that are not found as nodes in the graph"""
         g=self.open_graph()
