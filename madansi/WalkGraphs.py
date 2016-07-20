@@ -40,39 +40,41 @@ class WalkGraphs(object):
         return start_gene
     
     def walk_graph(self):
+        """Modification to the networkx function dfs_edges to search the graph whilst considering whether the vertices """
         g = self.add_node_attribute()
         
-        nodes = g
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         
+        nx.dfs_edges(h)
+        
+        nodes=h
         visited=set()
         list_dfs=[]
         for start in nodes:
-            if start in visited and g.node[start]['present']:
+            if start in visited:
                 continue
             visited.add(start)
-            stack = [(start,iter(g[start]))]
+            stack = [(start,iter(h[start]))]
             while stack:
                 parent,children = stack[-1]
                 try:
                     child = next(children)
-                    if child not in visited and g.node[start]['present']:
+                    if child not in visited:
                         list_dfs.append((parent,child))
                         visited.add(child)
-                        stack.append((child,iter(g[child])))
+                        stack.append((child,iter(h[child])))
                 except StopIteration:
                     stack.pop()
-                    
+        print(list_dfs)
         return list_dfs
-     #   for neighbor in g.neighbors(start_gene):
-     #       if not g.node[neighbor]['mark'] and g.node[neighbor]['present']:
-     #           next_gene = neighbor
-     #           g.node[next_gene]=True
                 
     def remove_added_edge_node_attributes(self):
+        """Removes the edge attribute 'present' created by the function 'add_node_attribute'"""
         g = self.open_graphfile()
         for gene in nx.nodes_iter(g):
             del g.node[gene]['present']
-            del g.node[gene]['mark']
+            
+            
         
             
             

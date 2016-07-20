@@ -34,7 +34,7 @@ class TestGraphs(unittest.TestCase):
     
     def test_genes_not_in_graph(self):
         """Tests graph that does not have all the genes listed in the dictionary"""
-        g=Graphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/graphs_unittest_4_genes_present')
+        g=Graphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/filtered_data_4_contigs')
         obtained_list=g.genes_not_in_graph()
         expected_list=['Contig4']
         self.assertCountEqual(obtained_list, expected_list)
