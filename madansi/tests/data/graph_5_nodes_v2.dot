@@ -6,6 +6,7 @@ Contig4;
 Contig5;
 Contig1 -- Contig2;
 Contig2 -- Contig3;
+Contig2 -- Contig4;
 Contig3 -- Contig4;
-Contig4 -- Contig5;
+Contig3 -- Contig5;
 }
