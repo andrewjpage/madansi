@@ -78,8 +78,8 @@ class WalkGraphs(object):
         except KeyError:
             raise KeyError('Given gene is not present')
         
-    def order_contigs(self,start_gene):
-        """Constructs a generator to find the closest neighbor from one end""" #NB will have to adjust this since the orientation may be wrong depending upon which way round the end points are chosen.
+    def order_contigs(self,start_gene): #Need to add another method to allow for possible reorientations
+        """Constructs a generator to find the closest neighbor from one end""" 
         end_list = self.find_ends_of_contig(start_gene)
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
    
@@ -103,11 +103,28 @@ class WalkGraphs(object):
                 queue.popleft()
     
     def closest_gene(self,start_gene):
+        """From the generator defined in order_contigs extracts the closest gene"""
         output_list = self.order_contigs(start_gene)
         for i in output_list:
             x = output_list.__next__()
         return x
-     
+        
+    def dictionary_pairs_closest_genes(self):
+        """Constructs a dictionary to pair all of the closest genes on separate contigs"""
+        end_genes_dict = {}
+        
+        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+        
+        for node in nx.nodes_iter(h):
+            end_list = self.find_ends_of_contig(node)
+            #Maybe want to change this so that it doesn't define stuff twice 
+            end_genes_dict[end_list[0]]= self.closest_gene(end_list[0])
+            end_genes_dict[end_list[1]]= self.closest_gene(end_list[1])
+        
+        return end_genes_dict
+        
+            
   #  def ordering_contigs(self):
   #      """Puts the contigs in order and orientates them as necessary"""
   #      visited = []

@@ -69,7 +69,7 @@ class TestWalkGraphs(unittest.TestCase):
         self.assertCountEqual(end_list,expected_list)
         
     def test_order_contigs(self):
-        """Tests that the """
+        
         wg = WalkGraphs('madansi/tests/data/graph_order_contigs.dot','madansi/tests/data/filtered_data_test_order_contigs')
         gene = wg.closest_gene('gene1')
         self.assertEqual(gene, 'gene6')
@@ -83,6 +83,11 @@ class TestWalkGraphs(unittest.TestCase):
         gene = wg.closest_gene('gene8')
         self.assertEqual(gene, 'gene3')
         
+    def test_dictionary_pairs_closest_genes(self):
         
-       
+        wg = WalkGraphs('madansi/tests/data/graph_order_contigs.dot','madansi/tests/data/filtered_data_test_order_contigs')
+        end_genes_dict = wg.dictionary_pairs_closest_genes()
+        end_genes_dict
+        expected_dictionary = {'gene1':'gene6', 'gene3':'gene6', 'gene6':'gene3', 'gene8':'gene3'}   
+        self.assertEqual(expected_dictionary, end_genes_dict)
                 
