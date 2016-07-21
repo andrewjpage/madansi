@@ -42,12 +42,12 @@ class TestWalkGraphs(unittest.TestCase):
         expected_list = ['7.23.B265.9.cap3_contig', 'Sample3', 'Sample4']
         self.assertCountEqual(contig_list, expected_list)
     
-    def test_find_neighbors_on_contig(self):
-        """Tests that the correct neighbors are given on the contig"""
-        wg = WalkGraphs('madansi/tests/data/graph_4_nodes.dot', 'madansi/tests/data/filtered_data_4_contigs')
-        contig_neighbor_list = wg.find_neighbors_on_contig('Contig2')
-        expected_list = ['Contig1','Contig3']
-        self.assertCountEqual(expected_list, contig_neighbor_list)
+  #  def test_find_neighbors_on_contig(self):
+  #      """Tests that the correct neighbors are given on the contig"""
+  #      wg = WalkGraphs('madansi/tests/data/graph_4_nodes.dot', 'madansi/tests/data/filtered_data_4_contigs')
+  #      contig_neighbor_list = wg.find_neighbors_on_contig('Contig2')
+  #      expected_list = ['Contig1','Contig3']
+  #      self.assertCountEqual(expected_list, contig_neighbor_list)
     
   #  def test_start_and_end_contigs(self):
   #      """Tests that the correct start and end to the contigs is given"""
@@ -67,3 +67,8 @@ class TestWalkGraphs(unittest.TestCase):
         
         end_list = wg.find_ends_of_contig('Contig3')
         self.assertCountEqual(end_list,expected_list)
+        
+    def test_order_contigs(self):
+        wg = WalkGraphs('madansi/tests/data/graph_order_contigs_1','madansi/tests/data/filtered_data_test_order_contigs')
+        output_list = wg.order_contigs()
+                

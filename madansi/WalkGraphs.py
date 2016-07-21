@@ -17,7 +17,6 @@ class WalkGraphs(object):
         except IOError:
             raise IOError("Error opening this file")
     
-    
     def create_subgraph(self):
         """Creates a subgraph with nodes representing the genes that are marked as present"""
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
@@ -78,6 +77,28 @@ class WalkGraphs(object):
         except KeyError:
             raise KeyError('Given gene is not present')
         
+    def order_contigs(self):
+        start_gene = self.starting_gene()
+        end_list = self.find_ends_of_contig(start_gene)
+        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+                
+        neighbors = g.neighbors_iter
+        
+        visited = set(end_list[0])
+        queue = deque([(end_list[0], neighbors(end_list[0]))])
+        while queue:
+            parent, children = queue[0]
+            try:
+                child = next(children)
+                if child not in visited:
+                    if not (g.node[child]['present'] and g.node[child]['Contig'] != contig):
+                        yield parent, child
+                        visited.add(child)
+                        queue.append((child, neighbors(child)))
+                    else:
+                        yield child
+            except StopIteration:
+                queue.popleft()
         
      
   #  def ordering_contigs(self):
