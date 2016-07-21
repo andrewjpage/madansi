@@ -17,14 +17,7 @@ class WalkGraphs(object):
         except IOError:
             raise IOError("Error opening this file")
     
-    def open_filtered_file(self):
-        """Opens the fitlered file for searching"""
-        try:
-            f = open(self.filteredfile,'r')
-            return f
-        except IOError:
-            raise IOError("Error opening this file") 
-        
+    
     def create_subgraph(self):
         """Creates a subgraph with nodes representing the genes that are marked as present"""
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
@@ -41,23 +34,32 @@ class WalkGraphs(object):
     
     def find_contig(self, gene):
         """Given a gene will find out the sequence that it is in"""
-        f = self.open_filtered_file()
-        for line in f:
-            l = line.rstrip().split('\t')
-            if l[0] == gene:
-                return l[1]
-    
+        try:
+            with open(self.filteredfile,'r') as f:
+                for line in f:
+                    l = line.rstrip().split('\t')
+                    if l[0] == gene:
+                        return l[1]
+                f.close()
+        except IOError:
+            raise IOError("Error opening this file")
+       
     def construct_contig_list(self):
         """Constructs a list that will contain all of the names of the contigs"""
         contig_list =[]
-        f = self.open_filtered_file()
-        for line in f:
-            l = line.rstrip().split('\t')
-            if l[1] not in contig_list:
-               contig_list.append(l[1])
-        return contig_list
+        try:
+            with open(self.filteredfile,'r') as f:
+                for line in f:
+                    l = line.rstrip().split('\t')
+                    if l[1] not in contig_list:
+                       contig_list.append(l[1])
+                return contig_list
+                f.close()
+                
+        except IOError:
+            raise IOError("Error opening this file")
         
-    def find_neighbors_on_contig(self, gene):
+    def find_neighbors_on_contig(self, gene): #Possibly irrelevant if we just iterate through the nodes and pick out those that only have one neighbor
         """Given a gene in the graph checks whether it is marked and if it is returns a list of all its
         neighbors also on the graph"""
         g = self.open_graph_file()
@@ -66,25 +68,29 @@ class WalkGraphs(object):
             contig = self.find_contig(gene)
             contig_neighbor_list = []
             for neighbor in g.neighbors(gene):
-                if g.node[neighbor]['present'] and self.find_contig(neighbor) == contig:
+                if h.node[neighbor] and self.find_contig(neighbor) == contig:
                     contig_neighbor_list.append(neighbor)
         else:
             raise KeyError('Given gene not marked as present')
         return contig_neighbor_list
+        
     
     def start_and_ends_contigs(self, gene):
         """Finds the genes at either end of the contig, defined from a marked gene on it, where the ends
          are defined to be based upon where the ends of the contig are marked on the graph"""
-        contig_neighbor_list = self.find_neighbors_on_contig()
+        g = self.open_graph_file()
+        h = self.create_subgraph()
+        
+        
      
-    def ordering_contigs(self):
-        """Puts the contigs in order and orientates them as necessary"""
-        visited = []
-        contig_list = self.construct_contig_list()
-        start_gene = self.starting_gene()
-        start_contig = self.find_contig(start_gene)
-        visited.append(start_contig)
-        while set(visited) != set(contig_list):
+  #  def ordering_contigs(self):
+  #      """Puts the contigs in order and orientates them as necessary"""
+  #      visited = []
+  #      contig_list = self.construct_contig_list()
+  #      start_gene = self.starting_gene()
+  #      start_contig = self.find_contig(start_gene)
+  #      visited.append(start_contig)
+  #      while set(visited) != set(contig_list):
             
         
         

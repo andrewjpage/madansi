@@ -17,12 +17,24 @@ class DepthFirstSearch(object):
         except IOError:
             raise Error("Error opening this file")
     
+    def find_contig(self, gene):
+        """Given a gene will find out the contig that it is in"""
+        try:
+            with open(self.filteredfile,'r') as f:
+                for line in f:
+                    l = line.rstrip().split('\t')
+                    if l[0] == gene:
+                        return l[1]
+                f.close()
+        except IOError:
+            raise IOError("Error opening this file")
 
     def add_node_attribute(self):
-        """Adds node attribute to the graph based on whether the gene is given as present in the lookup table"""    
+        """Adds node attribute to the graph based on whether the gene is given as present in the lookup table as well as the contig that the gene is in"""    
         g = self.open_graphfile()
         gene_dict = GenePresent.construct_dictionary(self)
         for gene in nx.nodes_iter(g):
+            g.node[gene]['Contig'] = self.find_contig(gene)
             if gene_dict[gene]:
                 g.node[gene]['present']=1
             else:

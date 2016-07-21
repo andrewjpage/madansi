@@ -18,11 +18,6 @@ class TestWalkGraphs(unittest.TestCase):
         g = wg.open_graph_file()
         self.assertTrue(g)
         
-    def test_open_filtered_file(self):
-        """Tests that the file with filtered data opens correctly"""
-        wg = WalkGraphs('ab', 'madansi/tests/data/gene_present_unittest')
-        f = wg.open_filtered_file()
-        self.assertTrue(f)
         
 #This test doesn't work because the former graph produced has the data as a number while the latter turns it into a string
          
@@ -40,15 +35,25 @@ class TestWalkGraphs(unittest.TestCase):
         start_gene= wg.starting_gene()
         self.assertTrue(h.node[start_gene])
         
-    def test_find_contig(self):
-        """Tests that the contig that the gene is in is correctly identified"""
-        wg = WalkGraphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/gene_present_unittest')
-        contig = wg.find_contig('Contig3')
-        self.assertEqual(contig, '7.23.B265.9.cap3_contig')
-    
     def test_construct_contig_list(self):
         """Tests that a list of all the possible contig sequences are included in the list"""
         wg = WalkGraphs('ab', 'madansi/tests/data/gene_present_unittest')
         contig_list = wg.construct_contig_list()
         expected_list = ['7.23.B265.9.cap3_contig', 'Sample3', 'Sample4']
         self.assertCountEqual(contig_list, expected_list)
+    
+    def test_find_neighbors_on_contig(self):
+        """Tests that the correct neighbors are given on the contig"""
+        wg = WalkGraphs('madansi/tests/data/graph_4_nodes.dot', 'madansi/tests/data/filtered_data_4_contigs')
+        contig_neighbor_list = wg.find_neighbors_on_contig('Contig2')
+        expected_list = ['Contig1','Contig3']
+        self.assertCountEqual(expected_list, contig_neighbor_list)
+    
+  #  def test_start_and_end_contigs(self):
+  #      """Tests that the correct start and end to the contigs is given"""
+  #      wg = WalkGraphs('madansi/tests/data/graph_5_nodes_2','madansi/tests/data/filtered_data_5_contigs')
+  #      ends_of_contig = wg.start_and_end_contigs('Contig1')
+  #      expected_ends = ['Contig1', 'Contig5']
+  #      self.assertCountEqual(ends_of_contig, expected_ends)
+  #      
+  #      ends_of_contig = wg.start_and_end_contigs('Contig3')
