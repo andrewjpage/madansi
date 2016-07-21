@@ -69,6 +69,20 @@ class TestWalkGraphs(unittest.TestCase):
         self.assertCountEqual(end_list,expected_list)
         
     def test_order_contigs(self):
-        wg = WalkGraphs('madansi/tests/data/graph_order_contigs_1','madansi/tests/data/filtered_data_test_order_contigs')
-        output_list = wg.order_contigs()
+        """Tests that the """
+        wg = WalkGraphs('madansi/tests/data/graph_order_contigs.dot','madansi/tests/data/filtered_data_test_order_contigs')
+        gene = wg.closest_gene('gene1')
+        self.assertEqual(gene, 'gene6')
+        
+        gene = wg.closest_gene('gene3')
+        self.assertEqual(gene, 'gene6')
+        
+        gene = wg.closest_gene('gene6')
+        self.assertEqual(gene, 'gene3')
+        
+        gene = wg.closest_gene('gene8')
+        self.assertEqual(gene, 'gene3')
+        
+        
+       
                 

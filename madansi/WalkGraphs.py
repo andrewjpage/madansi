@@ -2,6 +2,7 @@ import networkx as nx
 from madansi.BlastHit import BlastHit
 from madansi.GenePresent import GenePresent
 from madansi.DepthFirstSearch import DepthFirstSearch
+from collections import deque
 
 class WalkGraphs(object):
     
@@ -77,11 +78,11 @@ class WalkGraphs(object):
         except KeyError:
             raise KeyError('Given gene is not present')
         
-    def order_contigs(self):
-        start_gene = self.starting_gene()
+    def order_contigs(self,start_gene):
+        """Constructs a generator to find the closest neighbor from one end""" #NB will have to adjust this since the orientation may be wrong depending upon which way round the end points are chosen.
         end_list = self.find_ends_of_contig(start_gene)
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
-                
+   
         neighbors = g.neighbors_iter
         
         visited = set(end_list[0])
@@ -91,15 +92,21 @@ class WalkGraphs(object):
             try:
                 child = next(children)
                 if child not in visited:
-                    if not (g.node[child]['present'] and g.node[child]['Contig'] != contig):
+                    if g.node[child]['present'] and g.node[child]['Contig'] != g.node[end_list[0]]['Contig']:
+                        yield child
+                        break
+                    else:
                         yield parent, child
                         visited.add(child)
                         queue.append((child, neighbors(child)))
-                    else:
-                        yield child
             except StopIteration:
                 queue.popleft()
-        
+    
+    def closest_gene(self,start_gene):
+        output_list = self.order_contigs(start_gene)
+        for i in output_list:
+            x = output_list.__next__()
+        return x
      
   #  def ordering_contigs(self):
   #      """Puts the contigs in order and orientates them as necessary"""
