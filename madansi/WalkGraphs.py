@@ -59,27 +59,24 @@ class WalkGraphs(object):
         except IOError:
             raise IOError("Error opening this file")
         
-    def find_neighbors_on_contig(self, gene): #Possibly irrelevant if we just iterate through the nodes and pick out those that only have one neighbor
-        """Given a gene in the graph checks whether it is marked and if it is returns a list of all its
-        neighbors also on the graph"""
+    def find_ends_of_contig(self,gene):
+        """Given a gene, will find the ends of the contig containing that gene"""
         g = self.open_graph_file()
         h = self.create_subgraph()
-        if h.node[gene]:
-            contig = self.find_contig(gene)
-            contig_neighbor_list = []
-            for neighbor in g.neighbors(gene):
-                if h.node[neighbor] and self.find_contig(neighbor) == contig:
-                    contig_neighbor_list.append(neighbor)
-        else:
-            raise KeyError('Given gene not marked as present')
-        return contig_neighbor_list
-        
-    
-    def start_and_ends_contigs(self, gene):
-        """Finds the genes at either end of the contig, defined from a marked gene on it, where the ends
-         are defined to be based upon where the ends of the contig are marked on the graph"""
-        g = self.open_graph_file()
-        h = self.create_subgraph()
+        try:
+            end_list = []
+            contig = h.node[gene]['Contig']
+            for node in nx.nodes_iter(h):
+                if h.node[node]['Contig'] == contig:
+                    neighbor_list=[]
+                    for neighbor in h.neighbors(node):
+                        if h.node[neighbor]['Contig'] == contig:
+                            neighbor_list.append(neighbor)
+                    if len(neighbor_list)==1:
+                        end_list.append(node)
+            return end_list
+        except KeyError:
+            raise KeyError('Given gene is not present')
         
         
      

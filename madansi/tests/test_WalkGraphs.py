@@ -57,3 +57,13 @@ class TestWalkGraphs(unittest.TestCase):
   #      self.assertCountEqual(ends_of_contig, expected_ends)
   #      
   #      ends_of_contig = wg.start_and_end_contigs('Contig3')
+ 
+    def test_find_ends_of_contig(self):
+        """Tests that the ends of the contig have been found correctly"""
+        wg = WalkGraphs('madansi/tests/data/graph_5_nodes_2.dot', 'madansi/tests/data/filtered_data_5_contigs_2')
+        end_list = wg.find_ends_of_contig('Contig1')
+        expected_list = ['Contig1', 'Contig5']
+        self.assertCountEqual(end_list,expected_list)
+        
+        end_list = wg.find_ends_of_contig('Contig3')
+        self.assertCountEqual(end_list,expected_list)
