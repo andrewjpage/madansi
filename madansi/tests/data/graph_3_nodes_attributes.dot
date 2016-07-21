@@ -1,0 +1,7 @@
+strict graph "" {
+Contig2 [present=1];
+Contig3 [present=1];
+Contig1 [present=1];
+Contig2 -- Contig3;
+Contig1 -- Contig2;
+}

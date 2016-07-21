@@ -1,5 +1,4 @@
 import networkx as nx
-from random import choice
 from madansi.BlastHit import BlastHit
 from madansi.GenePresent import GenePresent
 
@@ -11,7 +10,7 @@ class DepthFirstSearch(object):
         self.filteredfile = filteredfile
     
     def open_graphfile(self):
-        """Open the given graph file for walking"""
+        """Open the given graph file for searching"""
         try:
             g=nx.Graph(nx.drawing.nx_pydot.read_dot(self.graphfile))
             return g
@@ -25,19 +24,19 @@ class DepthFirstSearch(object):
         gene_dict = GenePresent.construct_dictionary(self)
         for gene in nx.nodes_iter(g):
             if gene_dict[gene]:
-                g.node[gene]['present']=True
+                g.node[gene]['present']=1
             else:
-                g.node[gene]['present']=False
+                g.node[gene]['present']=0
         return g
             
-    def choose_starting_node(self):
-        
-        g=self.add_node_attribute()
-        for gene in nx.nodes_iter(g):
-            if g.node[gene]['present']:
-                start_gene = gene
-                break
-        return start_gene
+ #   def choose_starting_node(self):
+ #       
+ #       g=self.add_node_attribute()
+ #       for gene in nx.nodes_iter(g):
+ #           if g.node[gene]['present']:
+ #               start_gene = gene
+ #               break
+ #       return start_gene
     
     def depth_first_search(self):
         """Modification to the networkx function dfs_edges to search the graph whilst considering whether the vertices """
@@ -45,7 +44,6 @@ class DepthFirstSearch(object):
         
         h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         
-        nx.dfs_edges(h)
         
         nodes=h
         visited=set()
