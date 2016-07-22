@@ -6,9 +6,10 @@ from collections import deque
 
 class WalkGraphs(object):
     
-    def __init__(self,graphfile,filteredfile):
+    def __init__(self,graphfile,filteredfile, outputgraphfile):
         self.graphfile = graphfile
         self.filteredfile = filteredfile
+        self.outputgraphfile = outputgraphfile
         
     def open_graph_file(self):
         """Open the given graph file for searching"""
@@ -21,7 +22,7 @@ class WalkGraphs(object):
     def create_subgraph(self):
         """Creates a subgraph with nodes representing the genes that are marked as present"""
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present'] == 'Y'])
         return h
     
     def starting_gene(self):
@@ -32,7 +33,7 @@ class WalkGraphs(object):
             break
         return start_gene
     
-    def find_contig(self, gene):
+    def find_sequence(self, gene):
         """Given a gene will find out the sequence that it is in"""
         try:
             with open(self.filteredfile,'r') as f:
@@ -44,33 +45,33 @@ class WalkGraphs(object):
         except IOError:
             raise IOError("Error opening this file")
        
-    def construct_contig_list(self):
-        """Constructs a list that will contain all of the names of the contigs"""
-        contig_list =[]
+    def construct_sequence_list(self):
+        """Constructs a list that will contain all of the names of the sequences"""
+        sequence_list =[]
         try:
             with open(self.filteredfile,'r') as f:
                 for line in f:
                     l = line.rstrip().split('\t')
-                    if l[1] not in contig_list:
-                       contig_list.append(l[1])
-                return contig_list
+                    if l[1] not in sequence_list:
+                       sequence_list.append(l[1])
+                return sequence_list
                 f.close()
                 
         except IOError:
             raise IOError("Error opening this file")
         
-    def find_ends_of_contig(self,gene):
-        """Given a gene, will find the ends of the contig containing that gene"""
+    def find_ends_of_sequence(self,gene):
+        """Given a gene, will find the ends of the sequence containing that gene"""
         g = self.open_graph_file()
         h = self.create_subgraph()
         try:
             end_list = []
-            contig = h.node[gene]['Contig']
+            sequence = h.node[gene]['Contig']
             for node in nx.nodes_iter(h):
-                if h.node[node]['Contig'] == contig:
+                if h.node[node]['Contig'] == sequence:
                     neighbor_list=[]
                     for neighbor in h.neighbors(node):
-                        if h.node[neighbor]['Contig'] == contig:
+                        if h.node[neighbor]['Contig'] == sequence:
                             neighbor_list.append(neighbor)
                     if len(neighbor_list)==1:
                         end_list.append(node)
@@ -78,9 +79,9 @@ class WalkGraphs(object):
         except KeyError:
             raise KeyError('Given gene is not present')
         
-    def order_contigs(self,start_gene): #Need to add another method to allow for possible reorientations
+    def order_sequences(self,start_gene): #Need to add another method to allow for possible reorientations
         """Constructs a generator to find the closest neighbor from one end""" 
-        end_list = self.find_ends_of_contig(start_gene)
+        end_list = self.find_ends_of_sequence(start_gene)
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
    
         neighbors = g.neighbors_iter
@@ -98,7 +99,7 @@ class WalkGraphs(object):
                 child = next(children)
                 
                 if child not in visited:
-                    if g.node[child]['present'] and g.node[child]['Contig'] != g.node[gene]['Contig']:
+                    if g.node[child]['present']=='Y' and g.node[child]['Contig'] != g.node[gene]['Contig']:
                         yield child
                         break
                     else:
@@ -109,39 +110,84 @@ class WalkGraphs(object):
                 queue.popleft()
     
     def closest_gene(self,start_gene):
-        """From the generator defined in order_contigs extracts the closest gene"""
-        output_list = self.order_contigs(start_gene)
+        """From the generator defined in order_sequences extracts the closest gene"""
+        output_list = self.order_sequences(start_gene)
         x = output_list.__next__()
         while type(x) == tuple:
             x = output_list.__next__()
         return x
         
-        
-        
     def dictionary_pairs_closest_genes(self):
-        """Constructs a dictionary to pair all of the closest genes on separate contigs"""
-        end_genes_dict = {}
+        """Constructs a dictionary to pair all of the closest genes on separate sequences"""
+        closest_genes_dict = {}
         
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']=='Y'])
         
         for node in nx.nodes_iter(h):
-            end_list = self.find_ends_of_contig(node)
-            #Maybe want to change this so that it doesn't define stuff twice 
-            end_genes_dict[end_list[0]]= self.closest_gene(end_list[0])
-            end_genes_dict[end_list[1]]= self.closest_gene(end_list[1])
+            end_list = self.find_ends_of_sequence(node)
+            closest_genes_dict[end_list[0]]= self.closest_gene(end_list[0])
+            closest_genes_dict[end_list[1]]= self.closest_gene(end_list[1])
         
-        return end_genes_dict
+        visited_genes = []
         
+        for end_gene in list(closest_genes_dict.keys()):
+            if end_gene not in visited_genes:
+                sequence_1 = self.find_sequence(end_gene)
+                other_end = [i for i in self.find_ends_of_sequence(end_gene) if i!=end_gene][0]
+                sequence_2 = self.find_sequence(other_end)
+                visited_genes.append(end_gene)
+                visited_genes.append(other_end)
+                if sequence_1 == sequence_2:
+                    if nx.shortest_path_length(g,end_gene,closest_genes_dict[end_gene]) > nx.shortest_path_length(g,other_end, closest_genes_dict[other_end]):
+                        closest_genes_dict[end_gene] = None
+                    else:
+                        closest_genes_dict[other_end] = None
+
+        return closest_genes_dict        
             
-  #  def ordering_contigs(self):
-  #      """Puts the contigs in order and orientates them as necessary"""
-  #      visited = []
-  #      contig_list = self.construct_contig_list()
-  #      start_gene = self.starting_gene()
-  #      start_contig = self.find_contig(start_gene)
-  #      visited.append(start_contig)
-  #      while set(visited) != set(contig_list):
-            
+    def ordering_sequences(self):
+        """Puts the sequences in order and orientates them as necessary"""
+        closest_genes_dict = self.dictionary_pairs_closest_genes()
+        sequence_list = self.construct_sequence_list()
         
-    
+        visited = []
+        order_genes_visited = []
+        
+        for key in list(closest_genes_dict.keys()):
+            if closest_genes_dict[key]==None:
+                start_end = key
+                break
+        
+        start_sequence = self.find_sequence(start_end)
+        visited.append(start_sequence)
+        order_genes_visited.append(start_end)
+        ends_list = self.find_ends_of_sequence(start_end)
+        other_end = [ i for i in ends_list if i!= start_end][0]
+        order_genes_visited.append(other_end)
+        
+        while set(visited) != set(sequence_list):
+            if closest_genes_dict[other_end] != None:
+                start_end = closest_genes_dict[other_end]
+                visited.append(self.find_sequence(start_end))
+                order_genes_visited.append(start_end)
+                ends_list = self.find_ends_of_sequence(start_end)
+                other_end = [i for i in ends_list if i!= start_end][0]
+                order_genes_visited.append(other_end)
+        
+        return order_genes_visited
+            
+    def create_linear_subgraph(self):
+        """Creates a separate linear subgraph that will just consist """
+        
+        
+        closest_genes_dict = self.dictionary_pairs_closest_genes()
+        for key in list(closest_genes_dict.keys()):
+            if closest_genes_dict[key]==None:
+                start_end = key
+                break
+                
+        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']=='Y'])
+        
+        nx.Graph(nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile))

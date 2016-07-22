@@ -1,7 +1,7 @@
-strict graph "" {
-Contig2 [present=1];
-Contig3 [present=1];
-Contig1 [present=1];
+strict graph  {
+Contig2 [Contig=7.23.B265.9.cap3_contig, present=Y];
+Contig3 [Contig=7.23.B265.9.cap3_contig, present=Y];
+Contig1 [Contig=Sample3, present=Y];
 Contig2 -- Contig3;
 Contig1 -- Contig2;
 }
