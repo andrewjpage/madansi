@@ -85,19 +85,25 @@ class WalkGraphs(object):
    
         neighbors = g.neighbors_iter
         
-        visited = set(end_list[0])
-        queue = deque([(end_list[0], neighbors(end_list[0]))])
+        if start_gene in end_list:
+            gene = start_gene
+        else:
+            gene = end_list[0]
+        
+        visited = [gene]
+        queue = deque([(gene, neighbors(gene))])
         while queue:
             parent, children = queue[0]
             try:
                 child = next(children)
+                
                 if child not in visited:
-                    if g.node[child]['present'] and g.node[child]['Contig'] != g.node[end_list[0]]['Contig']:
+                    if g.node[child]['present'] and g.node[child]['Contig'] != g.node[gene]['Contig']:
                         yield child
                         break
                     else:
                         yield parent, child
-                        visited.add(child)
+                        visited.append(child)
                         queue.append((child, neighbors(child)))
             except StopIteration:
                 queue.popleft()
@@ -105,9 +111,12 @@ class WalkGraphs(object):
     def closest_gene(self,start_gene):
         """From the generator defined in order_contigs extracts the closest gene"""
         output_list = self.order_contigs(start_gene)
-        for i in output_list:
+        x = output_list.__next__()
+        while type(x) == tuple:
             x = output_list.__next__()
         return x
+        
+        
         
     def dictionary_pairs_closest_genes(self):
         """Constructs a dictionary to pair all of the closest genes on separate contigs"""
@@ -135,22 +144,4 @@ class WalkGraphs(object):
   #      while set(visited) != set(contig_list):
             
         
-        
-#First find a contig that is marked as present in the graph file.
-#Then look at all nodes that are neighbors of this node and see if there is a contig in the same or a different sequence (should be marked as being present in the lookup table) here. If it is in the same sequence - which we will know from looking at the filtered fasta file and the contig name- so should be the second column given that we have swapped the columns initially.
-#If a second contig has not been found then we would need to extend our search to two neighbours away and continue in that way. However, if a contig has been found then we need to go to the last present contig in that sequence and continue the search from there.      
-   
-#Add node attributes to make sure that the genes are actually present.        
-
-#Create subgraph with all the genes present in the contig
-
-#Work with this graph to find an initial gene to start with
-
-#Make a note of the contig that it is from- need to relate this back to the filtered file and should take the second column of the row where this gene is first. 
-#Open the filtered file for reading:
-
-#Iterate through the filtered file to find the record that includes the relevant gene and return the second entry of this row
-
-#Starting with the chosen gene will want to look through the neighbours to see if we can find a gene that is marked and belongs to a different contig.
-
     

@@ -42,22 +42,6 @@ class TestWalkGraphs(unittest.TestCase):
         expected_list = ['7.23.B265.9.cap3_contig', 'Sample3', 'Sample4']
         self.assertCountEqual(contig_list, expected_list)
     
-  #  def test_find_neighbors_on_contig(self):
-  #      """Tests that the correct neighbors are given on the contig"""
-  #      wg = WalkGraphs('madansi/tests/data/graph_4_nodes.dot', 'madansi/tests/data/filtered_data_4_contigs')
-  #      contig_neighbor_list = wg.find_neighbors_on_contig('Contig2')
-  #      expected_list = ['Contig1','Contig3']
-  #      self.assertCountEqual(expected_list, contig_neighbor_list)
-    
-  #  def test_start_and_end_contigs(self):
-  #      """Tests that the correct start and end to the contigs is given"""
-  #      wg = WalkGraphs('madansi/tests/data/graph_5_nodes_2','madansi/tests/data/filtered_data_5_contigs')
-  #      ends_of_contig = wg.start_and_end_contigs('Contig1')
-  #      expected_ends = ['Contig1', 'Contig5']
-  #      self.assertCountEqual(ends_of_contig, expected_ends)
-  #      
-  #      ends_of_contig = wg.start_and_end_contigs('Contig3')
- 
     def test_find_ends_of_contig(self):
         """Tests that the ends of the contig have been found correctly"""
         wg = WalkGraphs('madansi/tests/data/graph_5_nodes_2.dot', 'madansi/tests/data/filtered_data_5_contigs_2')
@@ -68,9 +52,10 @@ class TestWalkGraphs(unittest.TestCase):
         end_list = wg.find_ends_of_contig('Contig3')
         self.assertCountEqual(end_list,expected_list)
         
-    def test_order_contigs(self):
+    def test_closest_gene(self):
         
         wg = WalkGraphs('madansi/tests/data/graph_order_contigs.dot','madansi/tests/data/filtered_data_test_order_contigs')
+        
         gene = wg.closest_gene('gene1')
         self.assertEqual(gene, 'gene6')
         
@@ -82,12 +67,36 @@ class TestWalkGraphs(unittest.TestCase):
         
         gene = wg.closest_gene('gene8')
         self.assertEqual(gene, 'gene3')
+    
+
+        
+    def test_order_contigs_cycle(self):
+        wg = WalkGraphs('madansi/tests/data/graph_order_contigs_cycle.dot', 'madansi/tests/data/filtered_data_test_order_contigs')
+        
+        gene = wg.closest_gene('gene6')
+        self.assertEqual(gene,'gene3')
+          
+        gene = wg.closest_gene('gene3')
+        self.assertEqual(gene, 'gene6')
+    
+        gene = wg.closest_gene('gene8')
+        self.assertEqual(gene, 'gene1')
+  
+        gene = wg.closest_gene('gene1')
+        self.assertEqual(gene, 'gene8')
+       
         
     def test_dictionary_pairs_closest_genes(self):
         
         wg = WalkGraphs('madansi/tests/data/graph_order_contigs.dot','madansi/tests/data/filtered_data_test_order_contigs')
         end_genes_dict = wg.dictionary_pairs_closest_genes()
-        end_genes_dict
         expected_dictionary = {'gene1':'gene6', 'gene3':'gene6', 'gene6':'gene3', 'gene8':'gene3'}   
+        self.assertEqual(expected_dictionary, end_genes_dict)
+   
+    def test_dictionary_pairs_closest_genes_cycle(self):
+        
+        wg = WalkGraphs('madansi/tests/data/graph_order_contigs_cycle.dot', 'madansi/tests/data/filtered_data_test_order_contigs')
+        end_genes_dict = wg.dictionary_pairs_closest_genes()
+        expected_dictionary = {'gene1':'gene8', 'gene3':'gene6', 'gene6':'gene3', 'gene8':'gene1'}
         self.assertEqual(expected_dictionary, end_genes_dict)
                 
