@@ -22,7 +22,7 @@ class WalkGraphs(object):
     def create_subgraph(self):
         """Creates a subgraph with nodes representing the genes that are marked as present"""
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present'] == 'Y'])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         return h
     
     def starting_gene(self):
@@ -99,7 +99,7 @@ class WalkGraphs(object):
                 child = next(children)
                 
                 if child not in visited:
-                    if g.node[child]['present']=='Y' and g.node[child]['Contig'] != g.node[gene]['Contig']:
+                    if g.node[child]['present'] and g.node[child]['Contig'] != g.node[gene]['Contig']:
                         yield child
                         break
                     else:
@@ -122,7 +122,7 @@ class WalkGraphs(object):
         closest_genes_dict = {}
         
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']=='Y'])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         
         for node in nx.nodes_iter(h):
             end_list = self.find_ends_of_sequence(node)
@@ -178,9 +178,7 @@ class WalkGraphs(object):
         return order_genes_visited
             
     def create_linear_subgraph(self):
-        """Creates a separate linear subgraph that will just consist """
-        
-        
+        """Creates a separate linear subgraph that will just consist of the sequences with the shortest path between them"""
         closest_genes_dict = self.dictionary_pairs_closest_genes()
         for key in list(closest_genes_dict.keys()):
             if closest_genes_dict[key]==None:
@@ -188,6 +186,13 @@ class WalkGraphs(object):
                 break
                 
         g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']=='Y'])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+        
+        for key in list(closest_genes_dict.keys()):
+            if closest_genes_dict[key]!= None:
+                gene_path = nx.shortest_path(g,key, closest_genes_dict[key])
+                list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path)  - 1)]
+                h.add_nodes_from(gene_path)
+                h.add_edges_from(list_edges)
         
         nx.Graph(nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile))

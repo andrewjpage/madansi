@@ -36,16 +36,16 @@ class DepthFirstSearch(object):
         for gene in nx.nodes_iter(g):
             g.node[gene]['Contig'] = self.find_contig(gene)
             if gene_dict[gene]:
-                g.node[gene]['present']='Y'
+                g.node[gene]['present']=True
             else:
-                g.node[gene]['present']='N'
+                g.node[gene]['present']=False
         return g
         
     
     def depth_first_search(self):
         """Modification to the networkx function dfs_edges to search the graph whilst considering whether the vertices """
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present'] == 'Y'])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         
         
         nodes=h
