@@ -1,12 +1,12 @@
 strict graph "" {
-Contig1;
-Contig2;
-Contig3;
-Contig4;
-Contig5;
-Contig1 -- Contig2;
-Contig2 -- Contig3;
-Contig2 -- Contig4;
-Contig3 -- Contig4;
-Contig3 -- Contig5;
+gene1;
+gene2;
+gene3;
+gene4;
+gene5;
+gene1 -- gene2;
+gene2 -- gene3;
+gene2 -- gene4;
+gene3 -- gene4;
+gene3 -- gene5;
 }

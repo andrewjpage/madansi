@@ -1,9 +1,9 @@
 strict graph "" {
-Contig2;
-Contig3;
-Contig1;
-Contig4;
-Contig4 -- Contig1;
-Contig3 -- Contig2;
-Contig4 -- Contig3;
+Sequence2;
+Sequence3;
+Sequence1;
+Sequence4;
+Sequence4 -- Sequence1;
+Sequence3 -- Sequence2;
+Sequence4 -- Sequence3;
 }

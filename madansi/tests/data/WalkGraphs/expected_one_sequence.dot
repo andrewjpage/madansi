@@ -1,0 +1,11 @@
+strict graph "" {
+gene2 [Sequence=Sequence1, present=True];
+gene3 [Sequence=Sequence1, present=True];
+gene5 [Sequence=Sequence1, present=False];
+gene1 [Sequence=Sequence1, present=True];
+gene4 [Sequence=Sequence1, present=False];
+gene2 -- gene3;
+gene2 -- gene1;
+gene3 -- gene4;
+gene5 -- gene4;
+}

@@ -20,21 +20,21 @@ class WalkGraphs(object):
     
     
     def add_node_attribute(self):
-        """Adds node attribute to the graph based on whether the gene is given as present in the lookup table as well as the contig that the gene is in"""    
+        """Adds node attribute to the graph based on whether the gene is given as Present in the lookup table as well as the contig that the gene is in"""    
         g = self.open_graph_file()
         gene_dict = GenePresent.construct_dictionary(self)
         for gene in nx.nodes_iter(g):
-            g.node[gene]['Contig'] = self.find_sequence(gene)
+            g.node[gene]['Sequence'] = self.find_sequence(gene)
             if gene_dict[gene]:
-                g.node[gene]['present']=True
+                g.node[gene]['Present']=True
             else:
-                g.node[gene]['present']=False
+                g.node[gene]['Present']=False
         return g
     
     def create_subgraph(self):
-        """Creates a subgraph with nodes representing the genes that are marked as present"""
+        """Creates a subgraph with nodes rePresenting the genes that are marked as Present"""
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
         return h
     
     def starting_gene(self):
@@ -60,17 +60,13 @@ class WalkGraphs(object):
     def construct_sequence_list(self):
         """Constructs a list that will contain all of the names of the sequences"""
         sequence_list =[]
-        try:
-            with open(self.filteredfile,'r') as f:
-                for line in f:
-                    l = line.rstrip().split('\t')
-                    if l[1] not in sequence_list:
-                       sequence_list.append(l[1])
-                return sequence_list
-                f.close()
-                
-        except IOError:
-            raise IOError("Error opening this file")
+        g = self.add_node_attribute()
+        
+        for node in nx.nodes_iter(g):
+            if g.node[node]['Sequence'] not in sequence_list:
+                sequence_list.append(g.node[node]['Sequence'])
+        
+        return sequence_list
         
     def find_ends_of_sequence(self,gene):
         """Given a gene, will find the ends of the sequence containing that gene"""
@@ -78,18 +74,18 @@ class WalkGraphs(object):
         h = self.create_subgraph()
         try:
             end_list = []
-            sequence = h.node[gene]['Contig']
+            sequence = h.node[gene]['Sequence']
             for node in nx.nodes_iter(h):
-                if h.node[node]['Contig'] == sequence:
+                if h.node[node]['Sequence'] == sequence:
                     neighbor_list=[]
                     for neighbor in h.neighbors(node):
-                        if h.node[neighbor]['Contig'] == sequence:
+                        if h.node[neighbor]['Sequence'] == sequence:
                             neighbor_list.append(neighbor)
                     if len(neighbor_list)==1:
                         end_list.append(node)
             return end_list
         except KeyError:
-            raise KeyError('Given gene is not present')
+            raise KeyError('Given gene is not Present')
         
     def order_sequences(self,start_gene): #Need to add another method to allow for possible reorientations
         """Constructs a generator to find the closest neighbor from one end""" 
@@ -111,7 +107,7 @@ class WalkGraphs(object):
                 child = next(children)
                 
                 if child not in visited:
-                    if g.node[child]['present'] and g.node[child]['Contig'] != g.node[gene]['Contig']:
+                    if g.node[child]['Present'] and g.node[child]['Sequence'] != g.node[gene]['Sequence']:
                         yield child
                         break
                     else:
@@ -134,7 +130,7 @@ class WalkGraphs(object):
         closest_genes_dict = {}
         
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
         
         for node in nx.nodes_iter(h):
             end_list = self.find_ends_of_sequence(node)
@@ -142,19 +138,31 @@ class WalkGraphs(object):
             closest_genes_dict[end_list[1]]= self.closest_gene(end_list[1])
         
         visited_genes = []
+        list_end_genes = list(closest_genes_dict.keys())
         
-        for end_gene in list(closest_genes_dict.keys()):
-            if end_gene not in visited_genes:
-                sequence_1 = self.find_sequence(end_gene)
-                other_end = [i for i in self.find_ends_of_sequence(end_gene) if i!=end_gene][0]
-                sequence_2 = self.find_sequence(other_end)
-                visited_genes.append(end_gene)
-                visited_genes.append(other_end)
-                if sequence_1 == sequence_2:
-                    if nx.shortest_path_length(g,end_gene,closest_genes_dict[end_gene]) > nx.shortest_path_length(g,other_end, closest_genes_dict[other_end]):
-                        closest_genes_dict[end_gene] = None
-                    else:
-                        closest_genes_dict[other_end] = None
+        if len(list_end_genes) == 0:
+            pass
+        elif len(list_end_genes) == 1:
+            for gene in list_end_genes:
+                closest_genes_dict[gene] = None
+        else:
+            sequence_list = [self.find_sequence(gene) for gene in list_end_genes[0,1]]
+            if sequence_list[0]==sequence_list[1] and len(list_end_genes) == 2:
+                closest_genes_dict[list_end_genes[0]]= None
+                closest_genes_dict[list_end_genes[1]]= None
+            else:
+                for end_gene in list(closest_genes_dict.keys()):
+                    if end_gene not in visited_genes:
+                        sequence_1 = self.find_sequence(end_gene)
+                        other_end = [i for i in self.find_ends_of_sequence(end_gene) if i!=end_gene][0]
+                        sequence_2 = self.find_sequence(other_end)
+                        visited_genes.append(end_gene)
+                        visited_genes.append(other_end)
+                        if sequence_1 == sequence_2:
+                            if nx.shortest_path_length(g,end_gene,closest_genes_dict[end_gene]) > nx.shortest_path_length(g,other_end, closest_genes_dict[other_end]):
+                                closest_genes_dict[end_gene] = None
+                            else:
+                                closest_genes_dict[other_end] = None
 
         return closest_genes_dict        
             
@@ -191,20 +199,62 @@ class WalkGraphs(object):
             
     def create_linear_subgraph(self):
         """Creates a separate linear subgraph that will just consist of the sequences with the shortest path between them"""
-        closest_genes_dict = self.dictionary_pairs_closest_genes()
-        for key in list(closest_genes_dict.keys()):
-            if closest_genes_dict[key]==None:
-                start_end = key
-                break
+        sequence_list = self.construct_sequence_list()
+
+        if len(sequence_list) == 1:
+            g = self.add_node_attribute()
+            nx.drawing.nx_pydot.write_dot(g,self.outputgraphfile)
+            unused_sequences = []
+        else:
+        
+            closest_genes_dict = self.dictionary_pairs_closest_genes()
+            
+            g = self.add_node_attribute()
+            h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
+            
+            if len(closest_genes_dict) == 0:
+                if len(h.nodes())!=0:
+                    example_present_gene = h.nodes()[0]
+                    sequence = h.node[example_present_gene]['Sequence']
+                h = g.subgraph([node for node in g.nodes() if g.node[node]['Sequence']==sequence])
+                    
                 
-        g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
+            else:
+                for key in list(closest_genes_dict.keys()):
+                    if closest_genes_dict[key]==None:
+                        start_end = key
+                        break
+                   
+                unused_sequences=sequence_list
+                for node in nx.nodes_iter(h):
+                    if h.node[node]['Sequence'] in unused_sequences:
+                        unused_sequences.remove(h.node[node]['Sequence'])
+                   
+                   
+                for key in list(closest_genes_dict.keys()):                
+                    if closest_genes_dict[key]!= None:
+                        gene_path = nx.shortest_path(g,key, closest_genes_dict[key])
+                        list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path)  - 1)]
+                                           
+                        for node in gene_path:
+                            h.add_node(node)
+                            h.node[node]['Present'] = g.node[node]['Present']
+                            h.node[node]['Sequence'] = g.node[node]['Sequence']
+                            if h.node[node]['Sequence'] in unused_sequences:
+                                unused_sequences.remove(h.node[node]['Sequence'])
+                                   
+                        for edge in list_edges:
+                            if 'weight' in g.edge[edge[0]][edge[1]]:
+                                w = g.edge[edge[0]][edge[1]]['weight']
+                                h.add_edge(edge[0], edge[1],weight=w)
+                            else:
+                                h.add_edge(edge[0],edge[1])
+                 
+                nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile)
+                
+        return unused_sequences
+
         
-        for key in list(closest_genes_dict.keys()):
-            if closest_genes_dict[key]!= None:
-                gene_path = nx.shortest_path(g,key, closest_genes_dict[key])
-                list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path)  - 1)]
-                h.add_nodes_from(gene_path)
-                h.add_edges_from(list_edges)
         
-        nx.Graph(nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile))
+        
+        
