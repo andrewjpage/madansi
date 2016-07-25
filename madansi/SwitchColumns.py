@@ -20,3 +20,4 @@ class SwitchColumns(object):
                 my_records.append(rec)
             handle.close()
         SeqIO.write(my_records, self.outputfile, "fasta")
+        

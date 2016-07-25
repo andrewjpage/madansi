@@ -1,7 +1,6 @@
 import networkx as nx
 from madansi.BlastHit import BlastHit
 from madansi.GenePresent import GenePresent
-from madansi.DepthFirstSearch import DepthFirstSearch
 from collections import deque
 
 class WalkGraphs(object):
@@ -19,9 +18,22 @@ class WalkGraphs(object):
         except IOError:
             raise IOError("Error opening this file")
     
+    
+    def add_node_attribute(self):
+        """Adds node attribute to the graph based on whether the gene is given as present in the lookup table as well as the contig that the gene is in"""    
+        g = self.open_graph_file()
+        gene_dict = GenePresent.construct_dictionary(self)
+        for gene in nx.nodes_iter(g):
+            g.node[gene]['Contig'] = self.find_sequence(gene)
+            if gene_dict[gene]:
+                g.node[gene]['present']=True
+            else:
+                g.node[gene]['present']=False
+        return g
+    
     def create_subgraph(self):
         """Creates a subgraph with nodes representing the genes that are marked as present"""
-        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+        g = self.add_node_attribute()
         h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         return h
     
@@ -82,7 +94,7 @@ class WalkGraphs(object):
     def order_sequences(self,start_gene): #Need to add another method to allow for possible reorientations
         """Constructs a generator to find the closest neighbor from one end""" 
         end_list = self.find_ends_of_sequence(start_gene)
-        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+        g = self.add_node_attribute()
    
         neighbors = g.neighbors_iter
         
@@ -121,7 +133,7 @@ class WalkGraphs(object):
         """Constructs a dictionary to pair all of the closest genes on separate sequences"""
         closest_genes_dict = {}
         
-        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+        g = self.add_node_attribute()
         h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         
         for node in nx.nodes_iter(h):
@@ -185,7 +197,7 @@ class WalkGraphs(object):
                 start_end = key
                 break
                 
-        g = DepthFirstSearch(self.graphfile,self.filteredfile).add_node_attribute()
+        g = self.add_node_attribute()
         h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['present']])
         
         for key in list(closest_genes_dict.keys()):

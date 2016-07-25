@@ -1,6 +1,7 @@
 import unittest
 from madansi.SwitchColumns import SwitchColumns
 import filecmp
+import os
 
 class TestSwitchColumns(unittest.TestCase):
     

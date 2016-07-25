@@ -13,6 +13,7 @@ def file_reader(fname):
 
 class BlastHit:
     def __init__(self, line):
+    
         try:
             l = line.rstrip().split('\t')
             self.qry_name = l[0]
