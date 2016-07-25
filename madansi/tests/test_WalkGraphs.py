@@ -19,16 +19,6 @@ class TestWalkGraphs(unittest.TestCase):
         g = wg.open_graph_file()
         self.assertTrue(g)
              
- #   def test_create_subgraph(self):
- #       """Tests that a subgraph with the correct data attributes is created"""
- #       wg = WalkGraphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/gene_present_unittest')
- #       g = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/graph_3_nodes_attributes.dot'))
- #       h = wg.create_subgraph()
- #       print(h.nodes(data=True))
- #       print('--')
- #       print(g.nodes(data=True))
- #       self.assertCountEqual(h.nodes(data=True),g.nodes(data=True))
-
     def test_starting_gene(self):
         """Tests that a starting gene is chosen and that it is a node in the subgraph"""
         wg = WalkGraphs('madansi/tests/data/graph_3_nodes.dot','madansi/tests/data/gene_present_unittest','ef')
@@ -46,11 +36,11 @@ class TestWalkGraphs(unittest.TestCase):
     def test_find_ends_of_sequence(self):
         """Tests that the ends of the sequence have been found correctly"""
         wg = WalkGraphs('madansi/tests/data/graph_5_nodes_2.dot', 'madansi/tests/data/filtered_data_5_contigs_2', 'ef')
-        end_list = wg.find_ends_of_sequence('Sequence1')
-        expected_list = ['Sequence1', 'Sequence5']
+        end_list = wg.find_ends_of_sequence('gene1')
+        expected_list = ['gene1', 'gene5']
         self.assertCountEqual(end_list,expected_list)
         
-        end_list = wg.find_ends_of_sequence('Sequence3')
+        end_list = wg.find_ends_of_sequence('gene3')
         self.assertCountEqual(end_list,expected_list)
         
     def test_closest_gene(self):

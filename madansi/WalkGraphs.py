@@ -2,6 +2,7 @@ import networkx as nx
 from madansi.BlastHit import BlastHit
 from madansi.GenePresent import GenePresent
 from collections import deque
+from types import GeneratorType
 
 class WalkGraphs(object):
     
@@ -22,10 +23,10 @@ class WalkGraphs(object):
     def add_node_attribute(self):
         """Adds node attribute to the graph based on whether the gene is given as Present in the lookup table as well as the contig that the gene is in"""    
         g = self.open_graph_file()
-        gene_dict = GenePresent.construct_dictionary(self)
+        gene_present_dict = GenePresent.construct_dictionary(self)
         for gene in nx.nodes_iter(g):
             g.node[gene]['Sequence'] = self.find_sequence(gene)
-            if gene_dict[gene]:
+            if gene_present_dict[gene]:
                 g.node[gene]['Present']=True
             else:
                 g.node[gene]['Present']=False
@@ -40,10 +41,9 @@ class WalkGraphs(object):
     def starting_gene(self):
         """Chooses a starting gene and returns it"""
         h = self.create_subgraph()
-        for node in nx.nodes_iter(h):
-            start_gene = node
-            break
-        return start_gene
+        if len(h.nodes())>0:
+            start_gene = h.nodes()[0]
+            return start_gene
     
     def find_sequence(self, gene):
         """Given a gene will find out the sequence that it is in"""
@@ -85,13 +85,14 @@ class WalkGraphs(object):
                         end_list.append(node)
             return end_list
         except KeyError:
-            raise KeyError('Given gene is not Present')
+            raise KeyError('Given gene is not present')
+  
         
-    def order_sequences(self,start_gene): #Need to add another method to allow for possible reorientations
+    def order_sequences(self,start_gene): 
         """Constructs a generator to find the closest neighbor from one end""" 
         end_list = self.find_ends_of_sequence(start_gene)
         g = self.add_node_attribute()
-   
+    
         neighbors = g.neighbors_iter
         
         if start_gene in end_list:
@@ -116,15 +117,17 @@ class WalkGraphs(object):
                         queue.append((child, neighbors(child)))
             except StopIteration:
                 queue.popleft()
-    
+ 
+            
     def closest_gene(self,start_gene):
         """From the generator defined in order_sequences extracts the closest gene"""
         output_list = self.order_sequences(start_gene)
+
         x = output_list.__next__()
         while type(x) == tuple:
             x = output_list.__next__()
         return x
-        
+            
     def dictionary_pairs_closest_genes(self):
         """Constructs a dictionary to pair all of the closest genes on separate sequences"""
         closest_genes_dict = {}
@@ -146,7 +149,7 @@ class WalkGraphs(object):
             for gene in list_end_genes:
                 closest_genes_dict[gene] = None
         else:
-            sequence_list = [self.find_sequence(gene) for gene in list_end_genes[0,1]]
+            sequence_list = [self.find_sequence(gene) for gene in ( list_end_genes[0] or list_end_genes[1])]
             if sequence_list[0]==sequence_list[1] and len(list_end_genes) == 2:
                 closest_genes_dict[list_end_genes[0]]= None
                 closest_genes_dict[list_end_genes[1]]= None
@@ -200,23 +203,40 @@ class WalkGraphs(object):
     def create_linear_subgraph(self):
         """Creates a separate linear subgraph that will just consist of the sequences with the shortest path between them"""
         sequence_list = self.construct_sequence_list()
-
-        if len(sequence_list) == 1:
-            g = self.add_node_attribute()
+        unused_sequences=sequence_list
+        g = self.add_node_attribute()
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
+        
+        sequences_genes_present = []
+        for node in h.nodes():
+            if h.node[node]['Sequence'] not in sequences_genes_present:
+                sequences_genes_present.append(h.node[node]['Sequence'])
+            if len(sequences_genes_present) > 1:
+                break
+        if len(sequence_list) == 0: #No sequences present
+            unused_sequences = []
+            k = nx.Graph()
+            nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
+        elif len(sequence_list) == 1: #Only one sequence present
             nx.drawing.nx_pydot.write_dot(g,self.outputgraphfile)
             unused_sequences = []
-        else:
+        elif len(sequences_genes_present) == 0: #More than one sequence with no genes on them present
+            k = nx.Graph()
+            nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
+        elif len(sequences_genes_present) == 1: #Exactly one sequence with at least one gene on
+            sequence_present = sequences_genes_present[0]
+            unused_sequences.remove(sequence_present)
+            k = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Sequence'] == sequence_present])
+            nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
+        else: #At least two sequences with genes on
         
             closest_genes_dict = self.dictionary_pairs_closest_genes()
-            
-            g = self.add_node_attribute()
-            h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
             
             if len(closest_genes_dict) == 0:
                 if len(h.nodes())!=0:
                     example_present_gene = h.nodes()[0]
                     sequence = h.node[example_present_gene]['Sequence']
-                h = g.subgraph([node for node in g.nodes() if g.node[node]['Sequence']==sequence])
+                    h = g.subgraph([node for node in g.nodes() if g.node[node]['Sequence']==sequence])
                     
                 
             else:
@@ -249,10 +269,9 @@ class WalkGraphs(object):
                                 h.add_edge(edge[0], edge[1],weight=w)
                             else:
                                 h.add_edge(edge[0],edge[1])
-                 
-                nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile)
-                
+            nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile)   
         return unused_sequences
+        
 
         
         

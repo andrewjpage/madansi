@@ -1,7 +1,7 @@
 strict graph  {
-Sequence2 [Sequence=7.23.B265.9.cap3_contig, present=Y];
-Sequence3 [Sequence=7.23.B265.9.cap3_contig, present=Y];
-Sequence1 [Sequence=Sample3, present=Y];
-Sequence2 -- Sequence3;
-Sequence1 -- Sequence2;
+gene2 [Sequence=7.23.B265.9.cap3_contig, present=Y];
+gene3 [Sequence=7.23.B265.9.cap3_contig, present=Y];
+gene1 [Sequence=Sample3, present=Y];
+gene2 -- gene3;
+gene1 -- gene2;
 }

@@ -20,7 +20,7 @@ class TestWalkGraphsCases(unittest.TestCase):
         g = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
         h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph))
         self.assertTrue(output_list == [])
-        self.assertTrue(nx.is_isomorphic(h,g))
+        self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
         
     def test_two_sequences_no_genes(self):
@@ -33,8 +33,8 @@ class TestWalkGraphsCases(unittest.TestCase):
         output_list = wg.create_linear_subgraph()
         g = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
         h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph))
-        self.assertTrue(output_list == ['Sequence1', 'Sequence2'])
-        self.assertTrue(nx.is_isomorphic(h,g))
+        self.assertCountEqual(output_list,['Sequence1', 'Sequence2'])
+        self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
     
     def test_two_sequences_one_gene(self):
@@ -48,5 +48,23 @@ class TestWalkGraphsCases(unittest.TestCase):
         g = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
         h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph))
         self.assertTrue(output_list == ['Sequence2'])
-        self.assertTrue(nx.is_isomorphic(h,g))
+        self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
+
+    
+    def test_two_sequences_two_genes(self):
+        """Given two sequences both with genes on will check the correct orientation is given"""
+        output_file = 'output.dot'
+        expected_graph = 'madansi/tests/data/WalkGraphs/expected_two_sequences_two_genes_1.dot'
+        input_file= 'madansi/tests/data/WalkGraphs/two_sequences_two_genes_1.dot'
+        test_data = 'madansi/tests/data/WalkGraphs/WalkGraphs_test_data'
+        wg = WalkGraphs(input_file , test_data, output_file)
+        output_list = wg.create_linear_subgraph()
+        g = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
+        h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph))
+        self.assertTrue(output_list == [])
+        self.assertTrue(nx.is_isomorphic(g,h))
+        os.unlink(output_file)
+      
+        
+        
