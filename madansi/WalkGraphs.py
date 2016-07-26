@@ -213,12 +213,24 @@ class WalkGraphs(object):
                 sequences_genes_present.append(h.node[node]['Sequence'])
             if len(sequences_genes_present) > 1:
                 break
+                
         if len(sequence_list) == 0: #No sequences present
             unused_sequences = []
             k = nx.Graph()
             nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
         elif len(sequence_list) == 1: #Only one sequence present
-            nx.drawing.nx_pydot.write_dot(g,self.outputgraphfile)
+            
+            K = g.to_directed()
+            index_lines = GenePresent.index_filtered_file(self)
+            remove_edge_list = []
+            for edge in K.edges():
+                start_0 = self.find_query_start(index_lines[edge[0]])
+                start_1 = self.find_query_start(index_lines[edge[1]])
+                if start_0 > start_1:
+                    remove_edge_list.append(edge)
+            K.remove_edges_from(remove_edge_list)
+        
+            nx.drawing.nx_pydot.write_dot(K,self.outputgraphfile)
             unused_sequences = []
         elif len(sequences_genes_present) == 0: #More than one sequence with no genes on them present
             k = nx.Graph()
@@ -227,7 +239,18 @@ class WalkGraphs(object):
             sequence_present = sequences_genes_present[0]
             unused_sequences.remove(sequence_present)
             k = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Sequence'] == sequence_present])
-            nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
+            
+            K = k.to_directed()
+            index_lines = GenePresent.index_filtered_file(self)
+            remove_edge_list = []
+            for edge in K.edges():
+                start_0 = self.find_query_start(index_lines[edge[0]])
+                start_1 = self.find_query_start(index_lines[edge[1]])
+                if start_0 > start_1:
+                    remove_edge_list.append(edge)
+            K.remove_edges_from(remove_edge_list)
+            
+            nx.drawing.nx_pydot.write_dot(K,self.outputgraphfile)
         else: #At least two sequences with genes on
         
             closest_genes_dict = self.dictionary_pairs_closest_genes()
@@ -237,8 +260,6 @@ class WalkGraphs(object):
                     example_present_gene = h.nodes()[0]
                     sequence = h.node[example_present_gene]['Sequence']
                     h = g.subgraph([node for node in g.nodes() if g.node[node]['Sequence']==sequence])
-                    
-                
             else:
                 for key in list(closest_genes_dict.keys()):
                     if closest_genes_dict[key]==None:
@@ -269,11 +290,28 @@ class WalkGraphs(object):
                                 h.add_edge(edge[0], edge[1],weight=w)
                             else:
                                 h.add_edge(edge[0],edge[1])
-            nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile)   
+                                
+            K = h.to_directed()
+            index_lines = GenePresent.index_filtered_file(self)
+            remove_edge_list = []
+            for edge in K.edges():
+                start_0 = self.find_query_start(index_lines[edge[0]])
+                start_1 = self.find_query_start(index_lines[edge[1]])
+                if start_0 > start_1:
+                    remove_edge_list.append(edge)
+            K.remove_edges_from(remove_edge_list)
+            nx.drawing.nx_pydot.write_dot(K,self.outputgraphfile)   
+            
         return unused_sequences
-        
 
-        
-        
-        
-        
+    def find_query_start(self,line_no):
+        """Given a line that the gene is known to lie on in the filtered file, will find the subject start - column 9"""
+        try:
+            with open(self.filteredfile) as f:
+                for i, line in enumerate(f):
+                    if i == line_no:
+                        l = line.split("\t")
+                        return l[6]
+        except IOError:
+            raise IOError("Error opening this file")                
+            

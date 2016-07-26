@@ -5,6 +5,7 @@ from madansi.WalkGraphs import WalkGraphs
 import filecmp
 import networkx as nx
 import os
+from madansi.CreateLinearSubgraph import CreateLinearSubgraph
 
 
 class TestWalkGraphsCases(unittest.TestCase):
@@ -50,7 +51,7 @@ class TestWalkGraphsCases(unittest.TestCase):
         self.assertTrue(output_list == ['Sequence2'])
         self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
-
+ 
     
     def test_two_sequences_two_genes(self):
         """Given two sequences both with genes on will check the correct orientation is given"""
