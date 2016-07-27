@@ -1,5 +1,6 @@
 import networkx as nx
 from madansi.BlastHit import BlastHit
+from madansi.GeneDictionary import GeneDictionary
 from madansi.GenePresent import GenePresent
 from collections import deque
 from types import GeneratorType
@@ -19,44 +20,42 @@ class WalkGraphs(object):
         except IOError:
             raise IOError("Error opening this file")
     
+   # def add_node_attribute(self):
+   #     """Adds node attribute to the graph based on whether the gene is given as Present in the lookup table as well as the contig that the gene is in"""    
+   #     g = self.open_graph_file()
+   #     gene_present_dict = GenePresent.construct_dictionary_present(self)
+   #     for gene in nx.nodes_iter(g):
+   #         g.node[gene]['Sequence'] = self.find_sequence(gene)
+   #         if gene_present_dict[gene]:
+   #             g.node[gene]['Present']=True
+   #         else:
+   #             g.node[gene]['Present']=False
+   #     return g
+   # 
+   # def create_subgraph(self):
+   #     """Creates a subgraph with nodes rePresenting the genes that are marked as Present"""
+   #     g = self.add_node_attribute()
+   #     h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
+   #     return h
     
-    def add_node_attribute(self):
-        """Adds node attribute to the graph based on whether the gene is given as present in the lookup table as well as the contig that the gene is in"""    
-        g = self.open_graph_file()
-        gene_present_dict = GenePresent.construct_dictionary_present(self)
-        for gene in nx.nodes_iter(g):
-            g.node[gene]['Sequence'] = self.find_sequence(gene)
-            if gene in gene_present_dict:
-                if gene_present_dict[gene]:
-                    g.node[gene]['Present']=True
-                else:
-                    g.node[gene]['Present']=False
-        return g
+   # def starting_gene(self):
+   #     """Chooses a starting gene and returns it"""
+   #     h = self.create_subgraph()
+   #     if len(h.nodes())>0:
+   #         start_gene = h.nodes()[0]
+   #         return start_gene
     
-    def create_subgraph(self):
-        """Creates a subgraph with nodes rePresenting the genes that are marked as Present"""
-        g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if ('Present' in g.node[gene] and g.node[gene]['Present'])])
-        return h
-    
-    def starting_gene(self):
-        """Chooses a starting gene and returns it"""
-        h = self.create_subgraph()
-        if len(h.nodes())>0:
-            start_gene = h.nodes()[0]
-            return start_gene
-    
-    def find_sequence(self, gene): 
-        """Given a gene will find out the sequence that it is in"""
-        try:
-            with open(self.filteredfile,'r') as f:
-                for line in f:
-                    l = line.rstrip().split('\t')
-                    if l[0] == gene:
-                        return l[1]
-                f.close()
-        except IOError:
-            raise IOError("Error opening this file")
+   # def find_sequence(self, gene):
+   #     """Given a gene will find out the sequence that it is in"""
+   #     try:
+   #         with open(self.filteredfile,'r') as f:
+   #             for line in f:
+   #                 l = line.rstrip().split('\t')
+   #                 if l[0] == gene:
+   #                     return l[1]
+   #             f.close()
+   #     except IOError:
+   #         raise IOError("Error opening this file")
        
     def construct_sequence_list(self):
         """Constructs a list that will contain all of the names of the sequences"""
@@ -134,7 +133,7 @@ class WalkGraphs(object):
         closest_genes_dict = {}
         
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if ('Present' in g.node[gene] and g.node[gene]['Present'])])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
         
         for node in nx.nodes_iter(h):
             end_list = self.find_ends_of_sequence(node)
@@ -206,7 +205,7 @@ class WalkGraphs(object):
         sequence_list = self.construct_sequence_list()
         unused_sequences=sequence_list
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if ('Present' in g.node[gene] and g.node[gene]['Present'])])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
         
         sequences_genes_present = []
         for node in h.nodes():
@@ -277,6 +276,17 @@ class WalkGraphs(object):
             
         return unused_sequences
         
+        #K = g.to_directed()
+        #index_lines = GenePresent.index_filtered_file(self)
+        #remove_edge_list = []
+        #for edge in K.edges():
+        #    start_0 = self.find_query_start(index_lines[edge[0]])
+        #    start_1 = self.find_query_start(index_lines[edge[1]])
+        #    if start_0 > start_1:
+        #        remove_edge_list.append(edge)
+        #K.remove_edges_from(remove_edge_list)
+    
+        #nx.drawing.nx_pydot.write_dot(K,self.outputgraphfile)
         
 
     def find_query_start(self,line_no):

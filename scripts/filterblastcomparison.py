@@ -10,7 +10,7 @@ parser.add_argument('percentidentity', help= 'Parameter used to filter based on 
 parser.add_argument('alignmentlength', help='Parameter used to filter based on the alignment length', type=int, default=0)
 parser.add_argument('mismatches', help = 'Parameter used to filter based on the number of mismatches', type =int, default=10)
 parser.add_argument('gapopenings', help='Parameter used to filter based on the number of gap openings', type=int, default=10)
-parser.add_argument('evalue', help='Parameter used to filter based on the expect value', type=float, default=0.0)
+parser.add_argument('evalue', help='Parameter used to filter based on the expect value', type=float, default=10.0)
 parser.add_argument('bitscore', help='Parameter used to filter based on the bit score', type=float, default=0.0)
 args = parser.parse_args()
 

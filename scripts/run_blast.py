@@ -2,23 +2,25 @@
 
 import argparse
 from madansi.RunBLAST import RunBLAST
+from madansi.ValidateInputArguments import ValidateInputArguments
+from madansi.ValidateOutputArguments import ValidateOutputArguments
 
 parser = argparse.ArgumentParser(description = 'Runs BLAST on a database which has had switch_columns applied to it with a query fasta file')
-parser.add_argument('reference', help = 'path to the reference fasta file', type=str)
-parser.add_argument('outputreference', help = 'path to the output reference fasta file', type= str)
-parser.add_argument('outputdatabase', help= 'path to the output database', type = str)
 parser.add_argument('query', help = 'path to the query file', type =str)
-parser.add_argument('output', help='path to the output file', type=str)
+parser.add_argument('inputreference', help='path to the input reference fasta file', type=str)
+parser.add_argument('outputreference', help= 'path to the output reference fasta file with switched columns', type=str)
+parser.add_argument('outputdatabase', help= 'path to the output database', type = str)
+parser.add_argument('blastoutput', help= 'path to where the output file will be outputted', type = str)
 args = parser.parse_args()
 
 
-via = ValidateInputArguments(args.reference, args.query)
-via.run()
+#via = ValidateInputArguments(args.query)
+#via.run()
+#
+#voa = ValidateOutputArguments(args.outputdatabase, args.outputblast, args.finaloutput)
+#voa.run()
 
-voa = ValidateOutputArguments(args.outputreference, args.outputdatabase, args.output)
-voa.run
-
-rb = RunBLAST(args.reference, args.outputreference, args.outputdatabase, args.query, args.output)
-rb.run_switch_columns()
+rb = RunBLAST(args.query, args.inputreference, args.outputreference, args.outputdatabase, args.blastoutput)
+rb.run_switch_columns_database()
 rb.make_reference_database()
 rb.run_BLAST()

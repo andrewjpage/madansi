@@ -5,7 +5,6 @@ from madansi.WalkGraphs import WalkGraphs
 import filecmp
 import networkx as nx
 import os
-from madansi.CreateLinearSubgraph import CreateLinearSubgraph
 
 
 class TestWalkGraphsCases(unittest.TestCase):
@@ -52,7 +51,7 @@ class TestWalkGraphsCases(unittest.TestCase):
         self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
  
-    
+    #For testing that the correct orientation is given- will need to consider the filtered file to see if 
     def test_two_sequences_two_genes(self):
         """Given two sequences both with genes on will check the correct orientation is given"""
         output_file = 'output.dot'
@@ -60,6 +59,21 @@ class TestWalkGraphsCases(unittest.TestCase):
         input_file= 'madansi/tests/data/WalkGraphs/two_sequences_two_genes_1.dot'
         test_data = 'madansi/tests/data/WalkGraphs/WalkGraphs_test_data'
         wg = WalkGraphs(input_file , test_data, output_file)
+        output_list = wg.create_linear_subgraph()
+        g = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
+        h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph))
+        self.assertTrue(output_list == [])
+        self.assertTrue(nx.is_isomorphic(g,h))
+        os.unlink(output_file)
+        
+        
+    def test_one_sequence_2(self):
+        """Tests one sequence with genes present at both ends and a node between them"""
+        output_file = 'output.dot'
+        expected_graph = 'madansi/tests/data/WalkGraphs/expected_one_sequence_2.dot'
+        input_file = 'madansi/tests/data/WalkGraphs/one_sequence_2.dot'
+        test_data = 'madansi/tests/data/WalkGraphs/WalkGraphs_test_data'
+        wg = WalkGraphs(input_file ,test_data , output_file)
         output_list = wg.create_linear_subgraph()
         g = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
         h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph))

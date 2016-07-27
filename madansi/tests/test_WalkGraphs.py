@@ -103,11 +103,6 @@ class TestWalkGraphs(unittest.TestCase):
     
  
   
-    def test_create_linear_subgraph(self):
-        wg = WalkGraphs('madansi/tests/data/graph_order_cycle.dot', 'madansi/tests/data/filtered_data_test_order_sequences', 'output.dot')
-        wg.create_linear_subgraph()
-        os.unlink('output.dot')
-        
-        #Need to compare the list of unused sequences with expected and that the produced graph is the same as the expected 
+ 
 
         

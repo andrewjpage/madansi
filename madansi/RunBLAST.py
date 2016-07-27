@@ -3,15 +3,15 @@ from Bio.Blast.Applications import NcbiblastnCommandline
 import os
 
 class RunBLAST(object):
-    def __init__(self,inputreference,outputreference, outputdatabase, queryfile, finaloutput, evalue = 0.01):
+    def __init__(self,query,inputreference, outputreference, outputdatabase, blast_output, evalue = 0.01):
+        self.query = query
         self.inputreference = inputreference
         self.outputreference = outputreference
         self.outputdatabase = outputdatabase
-        self.queryfile = queryfile
-        self.finaloutput = finaloutput
+        self.blast_output = blast_output
         self.evalue = evalue
         
-    def run_switch_columns(self):
+    def run_switch_columns_database(self):
         """Switches the columns in the reference fasta file"""
         sw = SwitchColumns(self.inputreference, self.outputreference)
         sw.run()
@@ -23,5 +23,5 @@ class RunBLAST(object):
         
     def run_BLAST(self):
         """Run BLAST with the query file and the modified reference fasta file"""
-        blastn_cline = NcbiblastnCommandline(query = self.queryfile, db= self.outputdatabase, outfmt=6, out=self.finaloutput, task ='blastn', evalue= self.evalue)
+        blastn_cline = NcbiblastnCommandline(query = self.query, db= self.outputdatabase, outfmt=6, out=self.blast_output, task ='blastn', evalue= self.evalue)
         stdout, stderr = blastn_cline()

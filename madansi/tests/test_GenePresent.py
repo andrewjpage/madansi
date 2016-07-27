@@ -7,11 +7,11 @@ class TestGenePresent(unittest.TestCase):
         gp = GenePresent("ab")
         self.assertTrue(gp.filteredfile)
 
-    def test_construct_dictionary(self):
+    def test_construct_dictionary_present(self):
         """Tests whether the expected dictionary is the same as the dictionary created and whether the dictionary correctly 
         identifies the presence of some genes and the lack of presence of others"""
         gp = GenePresent('madansi/tests/data/gene_present_unittest')
-        gene_present_dict = gp.construct_dictionary()
+        gene_present_dict = gp.construct_dictionary_present()
         expected_dict = {'gene2':True, 'gene3':True, 'gene1':True , 'gene4':False}
         self.assertDictEqual(gene_present_dict, expected_dict)
 

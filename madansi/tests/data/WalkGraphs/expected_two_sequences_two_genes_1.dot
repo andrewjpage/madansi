@@ -4,8 +4,8 @@ gene2;
 gene11;
 gene6;
 gene7;
-gene1 -> gene2;
+gene1 -- gene2;
 gene2 -- gene11;
 gene11 -- gene6;
-gene6 -> gene7;
+gene6 -- gene7;
 }
