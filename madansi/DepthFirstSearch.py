@@ -1,3 +1,5 @@
+#Not needed in actual code
+
 import networkx as nx
 from madansi.BlastHit import BlastHit
 from madansi.GenePresent import GenePresent

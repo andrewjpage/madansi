@@ -18,26 +18,27 @@ class WalkGraphs(object):
             return g
         except IOError:
             raise IOError("Error opening this file")
-    
-    
+
     def add_node_attribute(self):
         """Adds node attribute to the graph based on whether the gene is given as present in the lookup table as well as the contig that the gene is in"""    
         g = self.open_graph_file()
         gene_present_dict = GenePresent.construct_dictionary_present(self)
         for gene in nx.nodes_iter(g):
-            g.node[gene]['Sequence'] = self.find_sequence(gene)
-            if gene in gene_present_dict:
+            if gene in GenePresent.index_filtered_file(self):
+                g.node[gene]['Sequence'] = GenePresent.construct_dictionary_sequence(self)[gene]   
                 if gene_present_dict[gene]:
                     g.node[gene]['Present']=True
                 else:
                     g.node[gene]['Present']=False
-        return g
+                g.node[gene]['Orientation'] = GenePresent.construct_dictionary_orientation(self)[gene]
+        G = g.subgraph([gene for gene in g.nodes() if 'Present' in g.node[gene]])
+        return G
     
     def create_subgraph(self):
-        """Creates a subgraph with nodes rePresenting the genes that are marked as Present"""
+        """Creates a subgraph with nodes rePresenting the genes that are marked as present"""
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if ('Present' in g.node[gene] and g.node[gene]['Present'])])
-        return h
+        k = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
+        return k
     
     def starting_gene(self):
         """Chooses a starting gene and returns it"""
@@ -46,7 +47,7 @@ class WalkGraphs(object):
             start_gene = h.nodes()[0]
             return start_gene
     
-    def find_sequence(self, gene): 
+    def find_sequence(self, gene): #Could replace with GenePresent.construct_dictionary_sequence
         """Given a gene will find out the sequence that it is in"""
         try:
             with open(self.filteredfile,'r') as f:
@@ -87,8 +88,7 @@ class WalkGraphs(object):
             return end_list
         except KeyError:
             raise KeyError('Given gene is not present')
-  
-        
+   
     def order_sequences(self,start_gene): 
         """Constructs a generator to find the closest neighbor from one end""" 
         end_list = self.find_ends_of_sequence(start_gene)
@@ -118,8 +118,7 @@ class WalkGraphs(object):
                         queue.append((child, neighbors(child)))
             except StopIteration:
                 queue.popleft()
- 
-            
+       
     def closest_gene(self,start_gene):
         """From the generator defined in order_sequences extracts the closest gene"""
         output_list = self.order_sequences(start_gene)
@@ -134,7 +133,7 @@ class WalkGraphs(object):
         closest_genes_dict = {}
         
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if ('Present' in g.node[gene] and g.node[gene]['Present'])])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present'])])
         
         for node in nx.nodes_iter(h):
             end_list = self.find_ends_of_sequence(node)
@@ -204,9 +203,14 @@ class WalkGraphs(object):
     def create_linear_subgraph(self):
         """Creates a separate linear subgraph that will just consist of the sequences with the shortest path between them"""
         sequence_list = self.construct_sequence_list()
+        print('Created sequence list')
         unused_sequences=sequence_list
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if ('Present' in g.node[gene] and g.node[gene]['Present'])])
+        
+        print('Added all node attributes')
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
+        
+        print('Created subgraph')
         
         sequences_genes_present = []
         for node in h.nodes():
@@ -236,6 +240,7 @@ class WalkGraphs(object):
         else: #At least two sequences with genes on
         
             closest_genes_dict = self.dictionary_pairs_closest_genes()
+            print('Constructed dictionary of pairs of closest genes')
             
             if len(closest_genes_dict) == 0:
                 if len(h.nodes())!=0:
@@ -247,17 +252,21 @@ class WalkGraphs(object):
                     if closest_genes_dict[key]==None:
                         start_end = key
                         break
+                
+                print('Found starting point')
                    
                 unused_sequences=sequence_list
                 for node in nx.nodes_iter(h):
                     if h.node[node]['Sequence'] in unused_sequences:
                         unused_sequences.remove(h.node[node]['Sequence'])
                    
+                print('Found unused sequences')
                    
                 for key in list(closest_genes_dict.keys()):                
                     if closest_genes_dict[key]!= None:
                         gene_path = nx.shortest_path(g,key, closest_genes_dict[key])
                         list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path)  - 1)]
+                        print('For' + key + ' found gene path and edges')
                                            
                         for node in gene_path:
                             h.add_node(node)
@@ -272,21 +281,10 @@ class WalkGraphs(object):
                                 h.add_edge(edge[0], edge[1],weight=w)
                             else:
                                 h.add_edge(edge[0],edge[1])
-                                
+            
+            print('done fot all nodes')                   
             nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile)
+            print('finished')
             
         return unused_sequences
-        
-        
-
-    def find_query_start(self,line_no):
-        """Given a line that the gene is known to lie on in the filtered file, will find the subject start - column 9"""
-        try:
-            with open(self.filteredfile) as f:
-                for i, line in enumerate(f):
-                    if i == line_no:
-                        l = line.split("\t")
-                        return l[6]
-        except IOError:
-            raise IOError("Error opening this file")                
-            
+   

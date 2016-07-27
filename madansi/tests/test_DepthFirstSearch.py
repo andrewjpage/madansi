@@ -44,6 +44,6 @@ class TestDepthFirstSearch(unittest.TestCase):
         expected_list=[('Contig1','Contig2'),('Contig2','Contig4')]
         self.assertCountEqual(list_dfs, expected_list)
     
-# Should maybe also test add_node_attribute to check that the correct data has been added
+# Should maybe also test add_node_attribute to check that the correct data has been added- except given that this function is no longer necessary this won't be needed
         
         

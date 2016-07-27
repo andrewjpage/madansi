@@ -18,6 +18,20 @@ class TestWalkGraphs(unittest.TestCase):
         wg = WalkGraphs('madansi/tests/data/graph_3_nodes.dot', 'cd', 'ef')
         g = wg.open_graph_file()
         self.assertTrue(g)
+        
+    def test_add_node_attribute(self):
+        """Tests that the correct subgraph for the data is produced with the correct node attributes"""
+        wg = WalkGraphs('madansi/tests/data/graph_5_nodes.dot','madansi/tests/data/gene_present_unittest' , 'ef')
+        g = wg.add_node_attribute()
+        h = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/graph_4_nodes.dot'))
+        self.assertTrue(nx.is_isomorphic(g,h))
+        self.assertTrue(g.node['gene1']['Present'] and g.node['gene1']['Sequence'] == 'Sample3' and not g.node['gene1']['Orientation']) 
+        self.assertTrue(g.node['gene2']['Present'] and g.node['gene2']['Sequence'] == '7.23.B265.9.cap3_contig' and not g.node['gene2']['Orientation']) 
+        self.assertTrue(g.node['gene3']['Present'] and g.node['gene3']['Sequence'] == '7.23.B265.9.cap3_contig' and g.node['gene3']['Orientation']) 
+        self.assertTrue(not g.node['gene4']['Present'] and g.node['gene4']['Sequence'] == 'Sample4' and g.node['gene4']['Orientation']) 
+    
+    def test_create_subgraph(self):
+        pass
              
     def test_starting_gene(self):
         """Tests that a starting gene is chosen and that it is a node in the subgraph"""
@@ -25,6 +39,9 @@ class TestWalkGraphs(unittest.TestCase):
         h = wg.create_subgraph()
         start_gene= wg.starting_gene()
         self.assertTrue(h.node[start_gene])
+        
+    def test_find_sequence(self):
+        pass
         
     def test_construct_sequence_list(self):
         """Tests that a list of all the possible sequences are included in the list"""
@@ -100,9 +117,5 @@ class TestWalkGraphs(unittest.TestCase):
         order_genes_visited = wg.ordering_sequences()
         expected_order = ['gene6', 'gene8', 'gene1',  'gene3']
         self.assertTrue(order_genes_visited == expected_order or order_genes_visited == expected_order[::-1])
-    
- 
-  
- 
 
-        
+#For testing of create_linear_subgraph see test_WalkGraphs_cases.py

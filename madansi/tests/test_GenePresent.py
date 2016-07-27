@@ -17,7 +17,19 @@ class TestGenePresent(unittest.TestCase):
 
         self.assertEqual(True, gene_present_dict['gene1'])
         self.assertEqual(gene_present_dict['gene4'], False)
-
+        
+    def test_construct_dictionary_sequence(self):
+        gp = GenePresent('madansi/tests/data/gene_present_unittest')
+        gene_sequence_dict = gp.construct_dictionary_sequence()
+        expected_dict = {'gene2': '7.23.B265.9.cap3_contig', 'gene3':'7.23.B265.9.cap3_contig', 'gene1':'Sample3', 'gene4':'Sample4'}
+        self.assertDictEqual(gene_sequence_dict, expected_dict)
+        
+    def test_construct_dictionary_orientation(self):
+        gp = GenePresent('madansi/tests/data/gene_present_unittest')
+        gene_orientation_dict = gp.construct_dictionary_orientation()
+        expected_dict = {'gene2': False, 'gene3': True, 'gene1': False, 'gene4': True}
+        self.assertDictEqual(expected_dict, gene_orientation_dict)
+        
     def test_list_genes_present(self):
         """Tests the list of genes present generated from the dictionary"""
         gene_present_dict = {'gene1':True, 'gene2':True, 'gene3':False, 'gene4':True, 'gene5':False}

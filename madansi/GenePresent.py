@@ -16,7 +16,7 @@ class GenePresent(object):
         except IOError:
             raise Error("Error opening this file")
         
-        for line in f:
+        for line in f: 
             bh = BlastHit(line)
             if bh.bit_score >= 150:
                 gene_present_dict[bh.qry_name] = True
