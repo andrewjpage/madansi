@@ -76,7 +76,7 @@ class TestWalkGraphs(unittest.TestCase):
         gene = wg.closest_gene('gene8')
         self.assertEqual(gene, 'gene3')
        
-    def test_order_sequences_cycle(self):
+    def test_closest_gene_cycle(self):
         """Tests that the closest gene on a different sequence to the given end gene is found - cyclic graph"""
         wg = WalkGraphs('madansi/tests/data/graph_order_cycle.dot', 'madansi/tests/data/filtered_data_test_order_sequences','ef')
         

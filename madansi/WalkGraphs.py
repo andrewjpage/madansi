@@ -128,8 +128,10 @@ class WalkGraphs(object):
         output_list = self.order_sequences(start_gene)
 
         x = output_list.__next__()
+        print(x)
         while type(x) == tuple:
             x = output_list.__next__()
+            print(x)
         return x
             
     def dictionary_pairs_closest_genes(self):
