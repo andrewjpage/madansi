@@ -22,7 +22,9 @@ class WalkGraphs(object):
     def add_node_attribute(self):
         """Adds node attribute to the graph based on whether the gene is given as present in the lookup table as well as the contig that the gene is in"""    
         g = self.open_graph_file()
+        print('Opened graph file')
         gene_present_dict = GenePresent.construct_dictionary_present(self)
+        print('Constructed gene present dictionary')
         for gene in nx.nodes_iter(g):
             if gene in GenePresent.index_filtered_file(self):
                 g.node[gene]['Sequence'] = GenePresent.construct_dictionary_sequence(self)[gene]   
@@ -31,7 +33,9 @@ class WalkGraphs(object):
                 else:
                     g.node[gene]['Present']=False
                 g.node[gene]['Orientation'] = GenePresent.construct_dictionary_orientation(self)[gene]
+                print('Added attributes for ' + gene)
         G = g.subgraph([gene for gene in g.nodes() if 'Present' in g.node[gene]])
+        print('Added node attributes')
         return G
     
     def create_subgraph(self):
@@ -67,7 +71,7 @@ class WalkGraphs(object):
         for node in nx.nodes_iter(g):
             if g.node[node]['Sequence'] not in sequence_list:
                 sequence_list.append(g.node[node]['Sequence'])
-        
+        print('Finished sequence list')
         return sequence_list
         
     def find_ends_of_sequence(self,gene):
@@ -133,7 +137,7 @@ class WalkGraphs(object):
         closest_genes_dict = {}
         
         g = self.add_node_attribute()
-        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present'])])
+        h = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Present']])
         
         for node in nx.nodes_iter(h):
             end_list = self.find_ends_of_sequence(node)
@@ -224,8 +228,6 @@ class WalkGraphs(object):
             k = nx.Graph()
             nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
         elif len(sequence_list) == 1: #Only one sequence present
-            
-           
             unused_sequences = []
             nx.drawing.nx_pydot.write_dot(g,self.outputgraphfile)
         elif len(sequences_genes_present) == 0: #More than one sequence with no genes on them present
@@ -235,7 +237,6 @@ class WalkGraphs(object):
             sequence_present = sequences_genes_present[0]
             unused_sequences.remove(sequence_present)
             k = g.subgraph([gene for gene in g.nodes() if g.node[gene]['Sequence'] == sequence_present])
-            
             nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
         else: #At least two sequences with genes on
         
@@ -282,7 +283,7 @@ class WalkGraphs(object):
                             else:
                                 h.add_edge(edge[0],edge[1])
             
-            print('done fot all nodes')                   
+            print('done for all nodes')                   
             nx.drawing.nx_pydot.write_dot(h,self.outputgraphfile)
             print('finished')
             
