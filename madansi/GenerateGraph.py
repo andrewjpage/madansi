@@ -39,30 +39,44 @@ class GenerateGraph(object):
         print('Created dictionary of genes orientation')
         return gene_orientation        
     
-    def ends_of_sequence(self,start_gene, graph, gene_present, gene_sequence):
+    def ends_of_sequence(self,start_gene, graph, gene_present, gene_sequence): #NB potential problem if the sample with genes on is not linear - i.e if it 
         try:
             end_list = []
             sequence = gene_sequence[start_gene]
+            visited = []
+            original_start_gene = start_gene
             
-            for node in nx.nodes_iter(graph):
-                if node in gene_present:
-                    if gene_present[node]:
-                        if gene_sequence[node] == sequence:
-                            neighbour_list = []
-                            for neighbor in graph.neighbors(node):
-                                if neighbor in gene_present:
-                                    if gene_sequence[neighbor] == sequence and gene_present[neighbor]:
-                                        neighbour_list.append(neighbor)
-                            if len(neighbour_list) == 1:
-                                end_list.append(node)
-            print('Constructed list of ends for this gene')
+            if all(gene_sequence[neighbor] != sequence for neighbor in graph.neighbors(start_gene) if gene_present[neighbor]): 
+                end_list.append(start_gene)
+            
+            else: 
+                
+                while len(end_list)<2:
+                        if len([gene for gene in graph.neighbors(start_gene) if gene_sequence[gene] == sequence and gene_present[gene]]) == 1:
+                            
+                            if start_gene not in end_list:
+                                end_list.append(start_gene)
+                                visited.append(start_gene)
+                                if start_gene != original_start_gene:
+                                    start_gene = original_start_gene
+                                else:
+                                    start_gene = [gene for gene in graph.neighbors(start_gene) if gene_sequence[gene] == sequence and gene_present[gene]][0]
+                        else:
+                            for i in [gene for gene in graph.neighbors(start_gene) if gene_sequence[gene] == sequence and gene_present[gene]]:
+
+                                if i not in visited:
+                                    visited.append(start_gene)
+                                    start_gene = i
+                                           
+                                    break
+
             return end_list
         except KeyError:
             raise KeyError('Given gene is not present')
             
     def order_sequences(self,start_gene,graph, gene_present, gene_sequence):
         end_list = self.ends_of_sequence(start_gene,graph, gene_present, gene_sequence)
-        
+
         neighbors = graph.neighbors_iter
         
         if start_gene in end_list:

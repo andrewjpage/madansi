@@ -37,10 +37,10 @@ class TestGenerateGraph(unittest.TestCase):
         self.assertDictEqual(gene_orientation, expected_dict)
     
     def test_ends_of_sequence(self):
-        gg = GenerateGraph('madansi/tests/data/graph_5_nodes_2.dot', 'madansi/tests/data/filtered_data_5_contigs_2', 'ef', 'gh')
+        gg = GenerateGraph('madansi/tests/data/graph_5_nodes.dot', 'madansi/tests/data/filtered_data_5_contigs_2', 'ef', 'gh')
         gene_present = {'gene2': True, 'gene3':True, 'gene1':True, 'gene4':True, 'gene5': True}
         gene_sequence = {'gene2':'7.23.B265.9.cap3_contig', 'gene3':'7.23.B265.9.cap3_contig', 'gene1':'7.23.B265.9.cap3_contig', 'gene4':'7.23.B265.9.cap3_contig', 'gene5':'7.23.B265.9.cap3_contig'}
-        graph = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/graph_5_nodes_2.dot'))
+        graph = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/graph_5_nodes.dot'))
         
         end_list = gg.ends_of_sequence('gene1', graph , gene_present, gene_sequence )
         expected_list = ['gene1', 'gene5']
@@ -49,8 +49,8 @@ class TestGenerateGraph(unittest.TestCase):
         end_list = gg.ends_of_sequence('gene3', graph, gene_present, gene_sequence)
         self.assertCountEqual(end_list, expected_list)
         
-    def test_closest_gene(self):
-        #Linear:   
+    def test_closest_gene_linear(self):
+        
         gg = GenerateGraph('madansi/tests/data/graph_order_sequences.dot', 'madansi/tests/data/filtered_data_test_order_sequences', 'ef', 'gh')
         gene_present = {'gene1':True, 'gene2':True, 'gene3':True, 'gene4':False, 'gene5':False, 'gene6':True, 'gene7':True, 'gene8':True, 'gene9':False, 'gene10':False}
         gene_sequence = {'gene1':'Sequence1', 'gene2':'Sequence1', 'gene3':'Sequence1', 'gene4':'Sequence1', 'gene5':'Sequence1', 'gene6':'Sequence2', 'gene7':'Sequence2', 'gene8':'Sequence2', 'gene9':'Sequence2', 'gene10':'Sequence2'}
@@ -68,10 +68,12 @@ class TestGenerateGraph(unittest.TestCase):
         gene = gg.closest_gene('gene6', graph, gene_present, gene_sequence)
         self.assertEqual(gene,'gene3')
         
-        #Cycle:
+    def test_closest_gene_cycle(self):
         gg = GenerateGraph('madansi/tests/data/graph_order_cycle.dot', 'madansi/tests/data/filtered_data_test_order_sequences', 'ef', 'gh')
+        gene_present = {'gene1':True, 'gene2':True, 'gene3':True, 'gene4':False, 'gene5':False, 'gene6':True, 'gene7':True, 'gene8':True, 'gene9':False, 'gene10':False}
+        gene_sequence = {'gene1':'Sequence1', 'gene2':'Sequence1', 'gene3':'Sequence1', 'gene4':'Sequence1', 'gene5':'Sequence1', 'gene6':'Sequence2', 'gene7':'Sequence2', 'gene8':'Sequence2', 'gene9':'Sequence2', 'gene10':'Sequence2'}
         graph = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/graph_order_cycle.dot'))
-        
+        #
         gene = gg.closest_gene('gene1', graph, gene_present, gene_sequence)
         self.assertEqual(gene, 'gene8')
         
@@ -84,7 +86,17 @@ class TestGenerateGraph(unittest.TestCase):
         gene = gg.closest_gene('gene6', graph, gene_present, gene_sequence)
         self.assertEqual(gene, 'gene3')
     
-    
+    def test_ends_of_sequence_one_gene(self):
+        """Tests the output from ends_of_sequence when there is only one gene present"""
+        gg = GenerateGraph('madansi/tests/data/GenerateGraph_testdata/ends_of_sequence_one_gene.dot', 'madansi/tests/data/GenerateGraph_testdata/GenerateGraph_test_data','ef', 'gh')
+        gene_present = {'gene1':True, 'gene2':True, 'gene3':True, 'gene4':False, 'gene5':False, 'gene12':True, 'gene6':True, 'gene7':True, 'gene8':True, 'gene9':False, 'gene10':False, 'gene11':False}
+        gene_sequence = {'gene1':'Sequence1', 'gene2':'Sequence1', 'gene3':'Sequence1', 'gene4':'Sequence1', 'gene5':'Sequence1', 'gene12':'Sequence1', 'gene6':'Sequence2', 'gene7':'Sequence2', 'gene8':'Sequence2', 'gene9':'Sequence2', 'gene10':'Sequence2', 'gene11':'Sequence3'}
+        
+        graph = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/GenerateGraph_testdata/ends_of_sequence_one_gene.dot'))
+        end_list = gg.ends_of_sequence('gene1', graph, gene_present, gene_sequence)
+        
+        self.assertEqual(end_list, ['gene1'])
+       
     def test_one_sequence(self):
         """Tests one sequence with no genes- should return the sequence"""
         output_file = 'output.dot'
@@ -134,7 +146,7 @@ class TestGenerateGraph(unittest.TestCase):
         self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
         os.unlink(unused_sequences)
-
+    
     def test_two_sequences_two_genes(self):
         """Given two sequences both with genes on will check that the linear combination of the two is given"""
         output_file = 'output.dot'
