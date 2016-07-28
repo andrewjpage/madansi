@@ -188,12 +188,19 @@ class GenerateGraph(object):
                         if gene_sequence[gene] in unused_sequences:
                             unused_sequences.remove(gene_sequence[gene])
                 print('Found unused sequences')
-                
+               
                 for key in list(closest_genes_dict.keys()):
                     if closest_genes_dict[key]!= None:
-                        if closest_genes_dict[key] == 'End of unconnected sequence':
+                                                    
+                        if closest_genes_dict[key]==False:
+                            end_list = self.ends_of_sequence(key,G, gene_present, gene_sequence)
+                            gene_path = nx.shortest_path(G, end_list[0], end_list[1] )
+                            for node in gene_path:
+                                if node in h.nodes():
+                                    h.remove_node(node)
                             if gene_sequence[key] not in unused_sequences:
-                                unused_sequences.append(gene_sequence(key))
+                                unused_sequences.append(gene_sequence[key])
+                            
                         else:
                             gene_path = nx.shortest_path(G, key, closest_genes_dict[key])
                             list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path) - 1)]
@@ -228,7 +235,6 @@ class GenerateGraph(object):
                     end_list = self.ends_of_sequence(gene, G,gene_present, gene_sequence)
                     for i in end_list:
                         closest_genes_dict[i] = self.closest_gene(i,G, gene_present, gene_sequence)
-                       
         
         visited_genes = []
         list_end_genes = list(closest_genes_dict.keys())
@@ -239,17 +245,6 @@ class GenerateGraph(object):
             for gene in list_end_genes:
                 closest_genes_dict[gene] = None
         else:
-            closest_genes_dict = {}
-            for gene in nx.nodes_iter(G):
-                if gene in gene_present:
-                    if gene_present[gene]:
-                        end_list = self.ends_of_sequence(gene, G,gene_present, gene_sequence)
-                        for i in end_list:
-                            closest_genes_dict[i] = self.closest_gene(i,G, gene_present, gene_sequence)
-        
-            visited_genes = []
-            list_end_genes = list(closest_genes_dict.keys())
-            
             if len(list_end_genes) == 2 and gene_sequence[list_end_genes[0]]==gene_sequence[list_end_genes[1]]:
                 closest_genes_dict[list_end_genes[0]] = None
                 closest_genes_dict[list_end_genes[1]] = None
@@ -261,11 +256,12 @@ class GenerateGraph(object):
                         sequence_2 = gene_sequence[other_end]
                         visited_genes.append(end_gene)
                         visited_genes.append(other_end)
-                        if sequence_1 == sequence_2:
-                            if nx.shortest_path_length(G, end_gene, closest_genes_dict[end_gene]) > nx.shortest_path_length(G, other_end, closest_genes_dict[other_end]):
-                                closest_genes_dict[end_gene] = None
-                            else:
-                                closest_genes_dict[other_end] = None
+                        if sequence_1 == sequence_2: #Something to do with a cycle that just considers two sequences that form a cycle.
+                            if closest_genes_dict[end_gene] != False and closest_genes_dict[other_end]!= False:
+                                if nx.shortest_path_length(G, end_gene, closest_genes_dict[end_gene]) > nx.shortest_path_length(G, other_end, closest_genes_dict[other_end]):
+                                    closest_genes_dict[end_gene] = None
+                                else:
+                                    closest_genes_dict[other_end] = None
         print('Constructed closest_genes_dict')
         
         return closest_genes_dict

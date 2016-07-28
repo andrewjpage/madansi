@@ -107,7 +107,7 @@ class TestGenerateGraph(unittest.TestCase):
         """Should return an empty graph with both sequences in the unused sequences list"""
         output_file = 'output.dot'
         unused_sequences = 'outputfile'
-        expected_graph = 'madansi/tests/data/GenerateGraph_testdata/expected_two_sequences_no_genes.dot'
+        expected_graph = 'madansi/tests/data/GenerateGraph_testdata/empty_graph_file.dot'
         input_file= 'madansi/tests/data/GenerateGraph_testdata/two_sequences_no_genes.dot'
         test_data = 'madansi/tests/data/GenerateGraph_testdata/GenerateGraph_test_data'
         gg = GenerateGraph(input_file , test_data, output_file, unused_sequences)
@@ -134,8 +134,7 @@ class TestGenerateGraph(unittest.TestCase):
         self.assertTrue(nx.is_isomorphic(g,h))
         os.unlink(output_file)
         os.unlink(unused_sequences)
-    
-   
+
     def test_two_sequences_two_genes(self):
         """Given two sequences both with genes on will check that the linear combination of the two is given"""
         output_file = 'output.dot'
@@ -156,7 +155,6 @@ class TestGenerateGraph(unittest.TestCase):
         """Given a graph with present genes surrounded by genes not present in the file, will test first that the correct dictionary of closest pairs is given """
         output_file = 'output.dot'
         unused_sequences = 'outputfile'
-        expected_graph_1 = 'madansi/tests/data/GenerateGraph_testdata/expected_neighbor_nodes_not_in_file_1.dot'
         input_file = 'madansi/tests/data/GenerateGraph_testdata/neighbor_nodes_not_in_file.dot'
         test_data = 'madansi/tests/data/GenerateGraph_testdata/GenerateGraph_test_data'        
         gg = GenerateGraph(input_file, test_data, output_file, unused_sequences)
@@ -167,15 +165,23 @@ class TestGenerateGraph(unittest.TestCase):
         
         g = nx.Graph(nx.drawing.nx_pydot.read_dot(input_file))
         G = g.subgraph([gene for gene in g.nodes() if gene in index_file])
-        h = nx.Graph(nx.drawing.nx_pydot.read_dot(expected_graph_1))
-        self.assertTrue(nx.is_isomorphic(G,h))
+        expected_graph_1 = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/GenerateGraph_testdata/expected_neighbor_nodes_not_in_file_1.dot'))
+        self.assertTrue(nx.is_isomorphic(G,expected_graph_1))
         
-        closest_genes_dict = {}
-        for gene in G.nodes():
-            end_list = gg.ends_of_sequence(gene, G, gene_present, gene_sequence)
-            for i in end_list:
-                closest_genes_dict[i] = gg.closest_gene(i,G, gene_present, gene_sequence)
+        closest_genes_dict = gg.construct_closest_pairs_dictionary(G, gene_present, gene_sequence)
         self.assertDictEqual(closest_genes_dict, {'gene1':False, 'gene3':False, 'gene7':False, 'gene8':False})
-
+       
+        unused_sequences = gg.generate_graph()
+        self.assertCountEqual(unused_sequences, ['Sequence1', 'Sequence2'])
+        
+        expected_graph_2 = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/GenerateGraph_testdata/empty_graph_file.dot'))
+        output_graph = nx.Graph(nx.drawing.nx_pydot.read_dot(output_file))
+        self.assertTrue(nx.is_isomorphic(output_graph, expected_graph_2))
+        
+        os.unlink(output_file)
+        os.unlink('outputfile')
+    
+    
+        
     
     
