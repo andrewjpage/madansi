@@ -1,6 +1,7 @@
 import networkx as nx
 from madansi.GenePresent import GenePresent
 from collections import deque
+import sys
 
 class GenerateGraph(object):
 	
@@ -49,8 +50,9 @@ class GenerateGraph(object):
                         if gene_sequence[node] == sequence:
                             neighbour_list = []
                             for neighbor in graph.neighbors(node):
-                                if gene_sequence[neighbor] == sequence and gene_present[neighbor]:
-                                    neighbour_list.append(neighbor)
+                                if neighbor in gene_present:
+                                    if gene_sequence[neighbor] == sequence and gene_present[neighbor]:
+                                        neighbour_list.append(neighbor)
                             if len(neighbour_list) == 1:
                                 end_list.append(node)
             print('Constructed list of ends for this gene')
@@ -85,18 +87,19 @@ class GenerateGraph(object):
                             queue.append((child, neighbors(child)))
             except StopIteration:
                 queue.popleft()
-        
-    
+                
+
     def closest_gene(self,start_gene, graph, gene_present, gene_sequence):
         output_list = self.order_sequences(start_gene, graph, gene_present, gene_sequence)
-        
         x = output_list.__next__()
-        print(x)
-        while type(x) == tuple:
-            x = output_list.__next__()
-            print(x)
+        try:
+            while type(x) == tuple:
+                x = output_list.__next__()
+            return x
+        except StopIteration:
+            return False
         print('Found closest gene')
-        return x
+
     
     def generate_graph(self):
         
@@ -171,6 +174,7 @@ class GenerateGraph(object):
                     example_present_gene = G.nodes()[0]
                     sequence = gene_sequence[example_present_gene]
                     k = G.subgraph([gene for gene in index_file if gene_sequence[gene]==sequence])
+                    nx.drawing.nx_pydot.write_dot(k,self.outputgraphfile)
             else:
                 for key in list(closest_genes_dict.keys()):
                     if closest_genes_dict[key] == None:
@@ -187,21 +191,25 @@ class GenerateGraph(object):
                 
                 for key in list(closest_genes_dict.keys()):
                     if closest_genes_dict[key]!= None:
-                        gene_path = nx.shortest_path(G, key, closest_genes_dict[key])
-                        list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path) - 1)]
-                    
-                    for node in gene_path:
-                        h.add_node(node)
-                        if gene_sequence[node] in unused_sequences:
-                            unused_sequences.remove(gene_sequence[node])
-                    
-                    for edge in list_edges:
-                        if 'weight' in G.edge[edge[0]][edge[1]]:
-                            w = G.edge[edge[0]][edge[1]]['weight']
-                            h.add_edge(edge[0], edge[1], weight=w)
+                        if closest_genes_dict[key] == 'End of unconnected sequence':
+                            if gene_sequence[key] not in unused_sequences:
+                                unused_sequences.append(gene_sequence(key))
                         else:
-                            h.add_edge(edge[0],edge[1])
-            
+                            gene_path = nx.shortest_path(G, key, closest_genes_dict[key])
+                            list_edges = [(gene_path[i], gene_path[i+1]) for i in range(len(gene_path) - 1)]
+                            
+                            for node in gene_path:
+                                h.add_node(node)
+                                if gene_sequence[node] in unused_sequences:
+                                    unused_sequences.remove(gene_sequence[node])
+                            
+                            for edge in list_edges:
+                                if 'weight' in G.edge[edge[0]][edge[1]]:
+                                    w = G.edge[edge[0]][edge[1]]['weight']
+                                    h.add_edge(edge[0], edge[1], weight=w)
+                                else:
+                                    h.add_edge(edge[0],edge[1])
+                            
             nx.drawing.nx_pydot.write_dot(h, self.outputgraphfile)
             print('Graph outputted')
         
@@ -218,8 +226,9 @@ class GenerateGraph(object):
             if gene in gene_present:
                 if gene_present[gene]:
                     end_list = self.ends_of_sequence(gene, G,gene_present, gene_sequence)
-                    closest_genes_dict[end_list[0]] = self.closest_gene(end_list[0],G, gene_present, gene_sequence)
-                    closest_genes_dict[end_list[1]] = self.closest_gene(end_list[1],G, gene_present, gene_sequence)
+                    for i in end_list:
+                        closest_genes_dict[i] = self.closest_gene(i,G, gene_present, gene_sequence)
+                       
         
         visited_genes = []
         list_end_genes = list(closest_genes_dict.keys())
@@ -235,12 +244,11 @@ class GenerateGraph(object):
                 if gene in gene_present:
                     if gene_present[gene]:
                         end_list = self.ends_of_sequence(gene, G,gene_present, gene_sequence)
-                        closest_genes_dict[end_list[0]] = self.closest_gene(end_list[0],G, gene_present, gene_sequence)
-                        closest_genes_dict[end_list[1]] = self.closest_gene(end_list[1],G, gene_present, gene_sequence)
+                        for i in end_list:
+                            closest_genes_dict[i] = self.closest_gene(i,G, gene_present, gene_sequence)
         
             visited_genes = []
             list_end_genes = list(closest_genes_dict.keys())
-            
             
             if len(list_end_genes) == 2 and gene_sequence[list_end_genes[0]]==gene_sequence[list_end_genes[1]]:
                 closest_genes_dict[list_end_genes[0]] = None
