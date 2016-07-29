@@ -35,4 +35,6 @@ class TestContig(unittest.TestCase):
         self.assertFalse(contig.add_blast_hit(blast_hit_object))
         
         self.assertCountEqual(list(contig.genes().keys()), ['gene1'])
+    
+    
         

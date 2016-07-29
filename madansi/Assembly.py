@@ -1,6 +1,5 @@
 from Bio import SeqIO
 
-
 class Assembly(object):
     def __init__(self, inputfile):
         self.inputfile = inputfile
@@ -13,7 +12,7 @@ class Assembly(object):
             handle.close()
         return sequence_list
        
-		
+
     
       
                 

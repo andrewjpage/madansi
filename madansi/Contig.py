@@ -17,4 +17,3 @@ class Contig(object):
         my_gene = Gene(blast_hit.orientation(), blast_hit.ref_start, blast_hit.ref_end, None, self.sequence_name)
         self.gene_objects[gene_name] = my_gene
         return True
-    
