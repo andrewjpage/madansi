@@ -39,6 +39,12 @@ class BlastHit:
                 raise Error('Error reading this blast line:\n' + line)
         except:
             raise Error('Error reading this blast line:\n' + line)
+    
+    def orientation(self):
+        if self.ref_start <= self.ref_end:
+            return 1
+        else:
+            return -1
 
     def __str__(self):
         s =  '\t'.join(str(x) for x in
