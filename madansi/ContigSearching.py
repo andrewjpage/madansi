@@ -7,6 +7,7 @@ class ContigSearching(object):
         self.genes_in_contig_radius = {}
         self.neighbouring_contigs = []    
         self.finished_contigs = set()
+        self.found_contigs = set()
     
     def contig_expansion(self):
         for sequence_name, genes in self.gene_detector.contigs.items():
@@ -29,9 +30,9 @@ class ContigSearching(object):
         iteration_count = 1
         self.contig_expansion()
         self.check_intersections(iteration_count)    
-        while set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.finished_contigs != set():
+        while set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.finished_contigs != set() and \
+        set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.found_contigs != set():
             iteration_count += 1
-            print(iteration_count)
             self.neighbourhood_expansion()
             self.check_intersections(iteration_count)      
     
@@ -45,6 +46,10 @@ class ContigSearching(object):
                 if set(gene_names_1) & set(gene_names_2) != set():
                     if not any( (sequence_name_1, sequence_name_2) == (entry[0], entry[1]) or (sequence_name_1, sequence_name_2) == (entry[1], entry[0]) for entry in self.neighbouring_contigs):
                         self.neighbouring_contigs.append((sequence_name_1, sequence_name_2,iteration_count))
+                        if sequence_name_1 not in self.found_contigs:
+                            self.found_contigs.add(sequence_name_1)
+                        if sequence_name_2 not in self.found_contigs:
+                            self.found_contigs.add(sequence_name_2)
         return self
     
                 
