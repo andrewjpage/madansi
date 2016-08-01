@@ -2,10 +2,12 @@ strict graph "" {
 gene1;
 gene2;
 geneA;
+geneB;
 gene4;
 gene5;
 gene1 -- gene2;
 gene2 -- geneA;
-geneA -- gene4;
+geneA -- geneB;
 gene4 -- gene5;
+geneB -- gene4;
 }
