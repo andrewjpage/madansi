@@ -1,0 +1,45 @@
+from madansi.NeighboursOfNodes import NeighboursOfNodes
+
+class ContigSearching(object):
+    def __init__(self, gene_detector, filtered_graph):
+        self.gene_detector = gene_detector
+        self.filtered_graph = filtered_graph
+        self.genes_in_contig_radius = {}
+        self.neighbouring_contigs = []    
+        self.finished_contigs = set()
+    
+    def contig_expansion(self):
+        for sequence_name, genes in self.gene_detector.contigs:
+            gene_names = [gene for gene in genes] 
+            self.set_expansion(gene_names, sequence_name)
+        
+    def neighbourhood_expansion(self):
+        for sequence_name, genes in self.genes_in_contig_radius:
+            self.set_expansion(genes, sequence_name)
+            
+    def set_expansion(self, gene_names, sequence_name):
+        neighbouring_nodes = NeighboursOfNodes(self.filtered_graph.graph).find_neighbours(gene_names)
+        self.genes_in_contig_radius[sequence_name] = gene_names + neighbouring_nodes
+        if neighbouring_nodes == []:
+            if sequence_name not in self.finished_contigs:
+                self.finished_contigs.add(sequence_name)
+        return
+        
+    def expand_all_contigs(self):
+        iteration_count = 1
+        self.contig_expansion()
+        self.check_intersections(itereation_count)
+        while set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.finished_contigs == set():
+            iteration_count += 1
+            self.neighbourhood_expansion()
+            self.check_intersections(iteration_count)      
+    
+    def check_intersections(self, iteration_count):
+        for sequence_name_1, gene_names_1 in self.genes_in_contig_radius:
+            for sequence_name_2, gene_names_2 in self.genes_in_contig_radius:
+                if sequence_name_1 == sequence_name_2:
+                    continue
+                if [list(filter(lambda x: x in gene_names_1, sublist) for sublist in gene_names_2)] != []:
+                    self.neighbouring_contigs.append((sequence_name_1, sequence_name_2, iteration_count))
+    
+                
