@@ -2,8 +2,8 @@ strict graph "" {
 gene2;
 gene3;
 gene1;
-gene4;
+geneA;
 gene2 -- gene3;
 gene1 -- gene2;
-gene4 -- gene1;
+geneA -- gene1;
 }
