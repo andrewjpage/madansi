@@ -2,7 +2,7 @@ from madansi.BlastHit import BlastHit
 from madansi.Gene import Gene
 
 class Contig(object):
-    
+    """Given a contig, will find all of the information about the genes within this contig"""
     def __init__(self, sequence_name):
         self.sequence_name = sequence_name
         self.gene_objects = {}

@@ -1,6 +1,7 @@
 from Bio import SeqIO
 
 class Assembly(object):
+    """Gives a list of all the contigs present in the sample"""
     def __init__(self, inputfile):
         self.inputfile = inputfile
     
