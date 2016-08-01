@@ -29,7 +29,7 @@ class ContigSearching(object):
     def expand_all_contigs(self):
         iteration_count = 1
         self.contig_expansion()
-        self.check_intersections(iteration_count)    
+        self.check_intersections(iteration_count) 
         while set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.finished_contigs != set() and \
         set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.found_contigs != set():
             iteration_count += 1
