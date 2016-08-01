@@ -18,7 +18,7 @@ class GenePresent(object):
         
         for line in f: 
             bh = BlastHit(line)
-            if bh.bit_score >= 150:
+            if bh.bit_score >= 200:
                 gene_present_dict[bh.qry_name] = True
             else:
                 gene_present_dict[bh.qry_name] = False
