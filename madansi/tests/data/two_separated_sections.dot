@@ -1,0 +1,18 @@
+strict graph "" {
+gene2;
+gene3;
+gene1;
+gene4;
+gene5;
+gene6;
+gene7;
+geneA;
+geneB;
+gene2 -- gene3;
+gene1 -- gene2;
+gene4 -- gene5;
+gene5 -- geneA;
+geneA -- geneB;
+geneB -- gene6;
+gene6 -- gene7;
+}

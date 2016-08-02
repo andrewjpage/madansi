@@ -1,0 +1,5 @@
+strict graph ""{
+Contig1;
+Contig2;
+Contig1 -- Contig2 [weight = 3];
+}

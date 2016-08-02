@@ -1,0 +1,12 @@
+strict graph ""{
+Contig1;
+Contig2;
+Contig3;
+Contig4;
+Contig5;
+Contig1 -- Contig2 [weight = 2];
+Contig1 -- Contig3 [weight = 3];
+Contig1 -- Contig4 [weight = 4];
+Contig3 -- Contig4 [weight = 1];
+Contig2 -- Contig5 [weight = 1];
+}
