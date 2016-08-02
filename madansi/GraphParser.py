@@ -6,11 +6,11 @@ class GraphParser(object):
         self.graph = self.filter_graph(self.open_graph_file())
         
     def filter_graph(self, graph):
-        #nodes_to_remove = []
-        #for node in graph.nodes_iter():
-        #    if graph.degree(node) > 3:
-        #        nodes_to_remove.append(node)
-        #graph.remove_nodes_from(nodes_to_remove)
+        nodes_to_remove = []
+        for node in graph.nodes_iter():
+            if graph.degree(node) > 3:
+                nodes_to_remove.append(node)
+        graph.remove_nodes_from(nodes_to_remove)
         return graph
 
     def open_graph_file(self):

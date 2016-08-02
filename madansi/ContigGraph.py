@@ -18,4 +18,4 @@ class ContigGraph(object):
     
     def output_contig_graph(self): 
         nx.drawing.nx_pydot.write_dot(self.contig_graph, self.output_contig_graph)
-        return
+        
