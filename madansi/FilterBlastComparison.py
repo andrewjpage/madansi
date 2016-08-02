@@ -24,19 +24,17 @@ class FilterBlastComparison(object):
         except IOError:
             raise Error('Error opening this file')
         
-        gene_to_contigs = {}
+        gene_list = []
         gene_duplicates = []
         
         for line in f:
             bh = BlastHit(line)
-            if bh.ref_name not in gene_to_contigs:
-                gene_to_contigs[bh.ref_name] = [bh.qry_name]
-            elif bh.qry_name not in gene_to_contigs[bh.ref_name]:
-                gene_to_contigs[bh.ref_name].append(bh.qry_name)
+            gene_list.append(bh.ref_name)
         
-        for gene in gene_to_contigs:
-            if len(gene_to_contigs[gene]) > 1:
-                gene_duplicates.append(gene)
+        for gene in gene_list:
+            if gene_list.count(gene) > 1:
+                if gene not in gene_duplicates:
+                    gene_duplicates.append(gene)
         
         return gene_duplicates
         
