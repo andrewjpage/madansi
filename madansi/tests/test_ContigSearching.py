@@ -53,8 +53,8 @@ class TestContigSearching(unittest.TestCase):
         contig_searching = ContigSearching(gene_detector, filtered_graph)
         contig_searching.expand_all_contigs()
         contig_neighbourhoods = contig_searching.neighbouring_contigs
-        self.assertTrue(contig_neighbourhoods == [('Contig1', 'Contig2', 2)] or \
-        contig_neighbourhoods == [('Contig2', 'Contig1', 2)])
+        self.assertTrue(contig_neighbourhoods == [('Contig1', 'Contig2', 3)] or \
+        contig_neighbourhoods == [('Contig2', 'Contig1', 3)])
     
     def test_expand_all_contigs_three_contigs_multiple_iterations(self):
         gene_detector = GeneDetector('madansi/tests/data/assembly.fa', 'madansi/tests/data/test_blast_hits_three_contigs')
@@ -65,12 +65,13 @@ class TestContigSearching(unittest.TestCase):
         possible_expected_lists = \
         [sorted([('Contig1', 'Contig2',2), ('Contig2', 'Contig3',2), ('Contig3', 'Contig1', 2)]),\
          sorted([('Contig2', 'Contig1',2), ('Contig2', 'Contig3',2), ('Contig3', 'Contig1', 2)]),\
+         sorted([('Contig2', 'Contig1',2), ('Contig2', 'Contig3',2), ('Contig1', 'Contig3', 2)]),\
          sorted([('Contig2', 'Contig1',2), ('Contig3', 'Contig2',2), ('Contig3', 'Contig1', 2)]),\
          sorted([('Contig2', 'Contig1',2), ('Contig3', 'Contig2',2), ('Contig1', 'Contig3', 2)]),\
-         sorted([('Contig2', 'Contig1',2), ('Contig3', 'Contig2',2), ('Contig1', 'Contig3', 2)]),\
          sorted([('Contig1', 'Contig2',2), ('Contig3', 'Contig2',2), ('Contig3', 'Contig1', 2)]),\
-         sorted([('Contig1', 'Contig2',2), ('Contig3', 'Contig2',2), ('Contig1', 'Contig3', 2)]),\
+         sorted([('Contig1', 'Contig2',2), ('Contig2', 'Contig3',2), ('Contig1', 'Contig3', 2)]),\
          sorted([('Contig1', 'Contig2',2), ('Contig3', 'Contig2',2), ('Contig1', 'Contig3', 2)])]
+        print(sorted(contig_neighbourhoods))
         self.assertTrue(sorted(contig_neighbourhoods) in possible_expected_lists)
         
     def test_one_contig_dummy_genes(self):
@@ -80,5 +81,6 @@ class TestContigSearching(unittest.TestCase):
         contig_searching.expand_all_contigs()
         contig_neighbourhoods = contig_searching.neighbouring_contigs
         self.assertEqual(contig_neighbourhoods, [])
+        
 
         
