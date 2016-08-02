@@ -3,11 +3,15 @@ gene1;
 gene2;
 geneA;
 geneB;
+geneC;
+geneD;
 gene4;
 gene5;
 gene1 -- gene2;
 gene2 -- geneA;
 geneA -- geneB;
 gene4 -- gene5;
-geneB -- gene4;
+geneC -- gene4;
+geneB -- geneD;
+geneD -- geneC;
 }
