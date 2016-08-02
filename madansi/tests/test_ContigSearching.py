@@ -81,6 +81,22 @@ class TestContigSearching(unittest.TestCase):
         contig_searching.expand_all_contigs()
         contig_neighbourhoods = contig_searching.neighbouring_contigs
         self.assertEqual(contig_neighbourhoods, [])
+    
+    def test_two_separated_sections(self):
+        gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/seven_blast_hits')
+        filtered_graph = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/two_separated_sections.dot'))
+        contig_searching = ContigSearching(gene_detector, filtered_graph)
+        contig_searching.expand_all_contigs()
+        contig_neighbourhoods = contig_searching.neighbouring_contigs
+        print(contig_neighbourhoods)
+        print(contig_searching.found_contigs)
+        print(contig_searching.finished_contigs)
+        possible_expected_lists = \
+        [sorted([('Contig1', 'Contig2', 1), ('Contig3', 'Contig4', 2)]),\
+         sorted([('Contig2', 'Contig1', 1), ('Contig3', 'Contig4', 2)]),\
+         sorted([('Contig1', 'Contig2', 1), ('Contig4', 'Contig3', 2)]),\
+         sorted([('Contig2', 'Contig1', 1), ('Contig4', 'Contig3', 2)])]
+        self.assertTrue(sorted(contig_neighbourhoods) in possible_expected_lists)
         
 
         

@@ -1,6 +1,8 @@
 from madansi.NeighboursOfNodes import NeighboursOfNodes
 
 class ContigSearching(object):
+    """Given all the contigs present, this will expand out the region around each contig looking for intersections. Once these have been found we know how far two \
+    contigs are away from each other and which ones are connected."""
     def __init__(self, gene_detector, filtered_graph):
         self.gene_detector = gene_detector
         self.filtered_graph = filtered_graph
@@ -24,6 +26,8 @@ class ContigSearching(object):
         if neighbouring_nodes == []:
             if sequence_name not in self.finished_contigs:
                 self.finished_contigs.add(sequence_name)
+            if sequence_name not in self.found_contigs:
+                self.found_contigs.add(sequence_name)
         return self
         
     def expand_all_contigs(self):
@@ -32,7 +36,6 @@ class ContigSearching(object):
         self.check_intersections(iteration_count) 
         while set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.finished_contigs != set() and \
         set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.found_contigs != set():
-            print(iteration_count)
             iteration_count += 1
             self.neighbourhood_expansion()
             self.check_intersections(iteration_count)    
