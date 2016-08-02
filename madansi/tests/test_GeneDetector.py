@@ -34,7 +34,6 @@ class TestGeneDetector(unittest.TestCase):
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].node, my_gene.node)
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].contig, my_gene.contig)
         
-        
     def test_contigs_to_genes_four_hits(self):
         gene_detector = GeneDetector('madansi/tests/data/assembly.fa', 'madansi/tests/data/four_blast_hits' )
         self.assertCountEqual(list(gene_detector.contigs_to_genes().keys()), ['Contig1', 'Contig2', 'Contig3'])

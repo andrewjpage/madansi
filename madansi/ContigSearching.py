@@ -32,9 +32,11 @@ class ContigSearching(object):
         self.check_intersections(iteration_count) 
         while set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.finished_contigs != set() and \
         set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.found_contigs != set():
+            print(iteration_count)
             iteration_count += 1
             self.neighbourhood_expansion()
-            self.check_intersections(iteration_count)      
+            self.check_intersections(iteration_count)    
+        return self.neighbouring_contigs  
     
     def check_intersections(self, iteration_count):
         for sequence_name_1, gene_names_1 in self.genes_in_contig_radius.items():
