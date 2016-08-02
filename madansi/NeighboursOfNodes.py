@@ -9,9 +9,9 @@ class NeighboursOfNodes(object):
     def find_neighbours(self, node_list):
         print(self.graph)
         for node in node_list:
-            
-            for neighbour in self.graph.neighbors(node):
-                if neighbour not in node_list and neighbour not in self.seen_nodes:
-                    self.seen_nodes.append(neighbour)
+            if node in self.graph.nodes():
+                for neighbour in self.graph.neighbors(node):
+                    if neighbour not in node_list and neighbour not in self.seen_nodes:
+                        self.seen_nodes.append(neighbour)
         return self.seen_nodes
         
