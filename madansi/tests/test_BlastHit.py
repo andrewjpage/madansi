@@ -39,7 +39,7 @@ class TestFileReader(unittest.TestCase):
             for hit in blast_reader:
                 print(hit, file=fout)
             fout.close()
-            self.assertTrue(filecmp.cmp('madansi/tests/data/blast_unittest.m8', tmp_out))
+            self.assertTrue(filecmp.cmp('madansi/tests/data/blast_unittest.m8', tmp_out, shallow=False))
             os.unlink(tmp_out)
             
  

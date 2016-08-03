@@ -31,6 +31,8 @@ class FilterBlastComparison(object):
             bh = BlastHit(line)
             gene_list.append(bh.ref_name)
         
+        f.close()
+        
         for gene in gene_list:
             if gene_list.count(gene) > 1:
                 if gene not in gene_duplicates:

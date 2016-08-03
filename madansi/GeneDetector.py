@@ -21,13 +21,9 @@ class GeneDetector(object):
         contigs = {}
         for sequence_name in self.assembly.sequence_names():
             contigs[sequence_name]= Contig(sequence_name)
-  
-
         for hit in self.parse_blast_hits():
             sequence_name = hit.qry_name
             contigs[sequence_name].add_blast_hit(hit)
-            
-
         return contigs
             
             

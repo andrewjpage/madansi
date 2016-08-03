@@ -7,8 +7,8 @@ class TestSwitchColumns(unittest.TestCase):
     
     def test_initialise_object(self):
         sw = SwitchColumns('abc','efg')
-        self.assertTrue(sw.inputfile)
-        self.assertTrue(sw.outputfile)
+        self.assertTrue(sw.input_file)
+        self.assertTrue(sw.output_file)
     
     def test_switching_around_columns(self):
         sw = SwitchColumns('madansi/tests/data/input_reference.fa','output_file')

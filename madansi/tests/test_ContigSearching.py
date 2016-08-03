@@ -71,7 +71,6 @@ class TestContigSearching(unittest.TestCase):
          sorted([('Contig1', 'Contig2',2), ('Contig3', 'Contig2',2), ('Contig3', 'Contig1', 2)]),\
          sorted([('Contig1', 'Contig2',2), ('Contig2', 'Contig3',2), ('Contig1', 'Contig3', 2)]),\
          sorted([('Contig1', 'Contig2',2), ('Contig3', 'Contig2',2), ('Contig1', 'Contig3', 2)])]
-        print(sorted(contig_neighbourhoods))
         self.assertTrue(sorted(contig_neighbourhoods) in possible_expected_lists)
         
     def test_one_contig_dummy_genes(self):
@@ -88,9 +87,6 @@ class TestContigSearching(unittest.TestCase):
         contig_searching = ContigSearching(gene_detector, filtered_graph)
         contig_searching.expand_all_contigs()
         contig_neighbourhoods = contig_searching.neighbouring_contigs
-        print(contig_neighbourhoods)
-        print(contig_searching.found_contigs)
-        print(contig_searching.finished_contigs)
         possible_expected_lists = \
         [sorted([('Contig1', 'Contig2', 1), ('Contig3', 'Contig4', 2)]),\
          sorted([('Contig2', 'Contig1', 1), ('Contig3', 'Contig4', 2)]),\
