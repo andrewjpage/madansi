@@ -47,7 +47,7 @@ class FilterBlastComparison(object):
         except IOError:
             raise Error('Error opening this file')
         
-        filtered_output = open(self.filtered_file, 'a')
+        filtered_output = open(self.filtered_file, 'w')
         gene_duplicates = self.find_gene_duplicates()
         
         for line in f:

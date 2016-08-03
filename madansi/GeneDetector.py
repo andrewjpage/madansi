@@ -5,15 +5,15 @@ from madansi.BlastHit import file_reader, BlastHit
 
 class GeneDetector(object):
     """An object that has all the contigs present as well as the genes within each contig and their information"""
-    def __init__(self, input_assembly_file, blast_hits_file):
+    def __init__(self, input_assembly_file, filtered_blast_hits_file):
         self.input_assembly_file = input_assembly_file
-        self.blast_hits_file = blast_hits_file
+        self.filtered_blast_hits_file = filtered_blast_hits_file
         self.assembly = Assembly(self.input_assembly_file)
         self.contigs = self.contigs_to_genes()
         
     def parse_blast_hits(self):
         hits = []
-        for hit in file_reader(self.blast_hits_file):
+        for hit in file_reader(self.filtered_blast_hits_file):
             hits.append(hit)
         return hits
             

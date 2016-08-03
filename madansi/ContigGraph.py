@@ -13,7 +13,6 @@ class ContigGraph(object):
         for entry in self.neighbouring_contigs:
             self.contig_graph.add_nodes_from([entry[0], entry[1]])
             self.contig_graph.add_edge(entry[0],entry[1], weight = entry[2])
-        #nx.drawing.nx_pydot.write_dot(self.contig_graph, self.output_contig_graph) #Should put this into a second method
         return self.contig_graph
     
     def output_contig_graph(self): 
