@@ -1,5 +1,5 @@
 class UnusedContigs(object):
-    def __init__(self,gene_detector, sequence_list, unused_contigs_file): #NB that the sequence_list will come from the assembly file- so all of the contigs that were originally present
+    def __init__(self,gene_detector, sequence_list, unused_contigs_file): 
         self.gene_detector = gene_detector
         self.sequence_list = sequence_list
         self.unused_contigs_list = []
