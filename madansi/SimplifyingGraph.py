@@ -1,11 +1,12 @@
 import networkx as nx
 
 
-class SimplifyingGraph(object):
+class SimplifyingGraph(object):#This graph still contains all of the contigs from the original contig graph
     
     def __init__(self, contig_graph, output_graph):
         self.contig_graph = contig_graph
         self.output_graph = output_graph
+        self.unused_contig_file = unused_contig_file
         
     def simplifying_graph(self):    
         changes_made = True
