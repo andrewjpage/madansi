@@ -4,13 +4,18 @@ class GraphParser(object):
     def __init__(self, graph_file):
         self.graph_file = graph_file
         self.graph = self.filter_graph(self.open_graph_file())
+       
         
     def filter_graph(self, graph):
-        nodes_to_remove = []
+        edges_to_remove = []
         for node in graph.nodes_iter():
-            if graph.degree(node) > 3:
-                nodes_to_remove.append(node)
-        graph.remove_nodes_from(nodes_to_remove)
+            if graph.degree(node) >= 4:
+                edge_list = graph.edges(node, data=True)
+                max_weight = max([weight['weight'] for edge_0, edge_1, weight in edge_list])
+                for edge in edge_list:
+                    if edge[2]['weight'] == max_weight:
+                        edges_to_remove.append(edge)
+        graph.remove_edges_from(edges_to_remove)
         return graph
 
     def open_graph_file(self):
