@@ -1,4 +1,5 @@
 from madansi.NeighboursOfNodes import NeighboursOfNodes
+import pprint
 
 class ContigSearching(object):
     """Given all the contigs present, this will expand out the region around each contig looking for intersections. Once these have been found we know how far two \
@@ -38,7 +39,7 @@ class ContigSearching(object):
         set([sequence_name for sequence_name in self.gene_detector.contigs]) - self.found_contigs != set():
             iteration_count += 1
             self.neighbourhood_expansion()
-            self.check_intersections(iteration_count)    
+            self.check_intersections(iteration_count)   
         return self.neighbouring_contigs  
     
     def check_intersections(self, iteration_count):
@@ -50,7 +51,7 @@ class ContigSearching(object):
                     continue
                 if set(gene_names_1) & set(gene_names_2) != set():
                     if not any( (sequence_name_1, sequence_name_2) == (entry[0], entry[1]) or (sequence_name_1, sequence_name_2) == (entry[1], entry[0]) for entry in self.neighbouring_contigs):
-                        self.neighbouring_contigs.append((sequence_name_1, sequence_name_2,iteration_count))
+                        self.neighbouring_contigs.append((sequence_name_1, sequence_name_2,iteration_count, [node for node in set(gene_names_1) & set(gene_names_2)]))
                         if sequence_name_1 not in self.found_contigs:
                             self.found_contigs.add(sequence_name_1)
                         if sequence_name_2 not in self.found_contigs:
