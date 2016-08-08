@@ -51,7 +51,7 @@ class ContigSearching(object):
                     continue
                 if set(gene_names_1) & set(gene_names_2) != set():
                     if not any( (sequence_name_1, sequence_name_2) == (entry[0], entry[1]) or (sequence_name_1, sequence_name_2) == (entry[1], entry[0]) for entry in self.neighbouring_contigs):
-                        self.neighbouring_contigs.append((sequence_name_1, sequence_name_2,iteration_count, [node for node in set(gene_names_1) & set(gene_names_2)]))
+                        self.neighbouring_contigs.append([sequence_name_1, sequence_name_2,iteration_count, [node for node in set(gene_names_1) & set(gene_names_2)]])
                         if sequence_name_1 not in self.found_contigs:
                             self.found_contigs.add(sequence_name_1)
                         if sequence_name_2 not in self.found_contigs:
