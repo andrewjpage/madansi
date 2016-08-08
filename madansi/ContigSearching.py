@@ -45,13 +45,11 @@ class ContigSearching(object):
     def check_intersections(self, iteration_count):
         for sequence_name_1, gene_names_1 in self.genes_in_contig_radius.items():
             for sequence_name_2, gene_names_2 in self.genes_in_contig_radius.items():
-                if gene_names_1 == [] or gene_names_2 == []:
-                    continue
-                if sequence_name_1 == sequence_name_2:
-                    continue
+                if gene_names_1 == [] or gene_names_2 == []: continue
+                if sequence_name_1 == sequence_name_2: continue
                 if set(gene_names_1) & set(gene_names_2) != set():
-                    if not any( (sequence_name_1, sequence_name_2) == (entry[0], entry[1]) or (sequence_name_1, sequence_name_2) == (entry[1], entry[0]) for entry in self.neighbouring_contigs):
-                        self.neighbouring_contigs.append([sequence_name_1, sequence_name_2,iteration_count, [node for node in set(gene_names_1) & set(gene_names_2)]])
+                    if all( sorted((sequence_name_1, sequence_name_2)) != entry[0] for entry in self.neighbouring_contigs):
+                        self.neighbouring_contigs.append([sorted((sequence_name_1, sequence_name_2)) ,iteration_count, sorted([node for node in set(gene_names_1) & set(gene_names_2)])])
                         if sequence_name_1 not in self.found_contigs:
                             self.found_contigs.add(sequence_name_1)
                         if sequence_name_2 not in self.found_contigs:
