@@ -1,0 +1,13 @@
+strict graph "" {
+contig1;
+contig2;
+contig3;
+contig4;
+contig5;
+contig6;
+contig7;
+contig2 -- contig3;
+contig4 -- contig5;
+contig5 -- contig6;
+contig6 -- contig7;
+}
