@@ -1,5 +1,4 @@
 import networkx as nx
-import pprint
 from madansi.GenesToContig import GenesToContig
 from madansi.NeighboursOfNodes import NeighboursOfNodes
 import sys
@@ -16,24 +15,20 @@ class RefineContigNeighbours(object):
     def refine_contig_neighbours(self):
         for neighbours in self.neighbouring_contigs:
             seen_nodes = []
-            for neighbour in neighbours[3]:
+            for neighbour in neighbours[2]:
                 seen_nodes.append(neighbour)
-            iteration_count = 0
-            for i in range(neighbours[2] + 2):
+            for i in range(neighbours[1] + 2):
                 neighbouring_nodes = NeighboursOfNodes(self.filtered_graph).find_neighbours(seen_nodes)
                 for neighbour_node in neighbouring_nodes:
                     seen_nodes.append(neighbour_node)
             contig_appearances = self.count_contig_appearance(seen_nodes)
-            if not contig_appearances[neighbours[0]] <=1 and not contig_appearances[neighbours[1]] <=1 :
-                if len(contig_appearances)==2:
-                    self.refined_neighbouring_contigs.append(neighbours)
-        pprint.pprint(self.refined_neighbouring_contigs)            
+            if contig_appearances[neighbours[0][0]] > 1 and contig_appearances[neighbours[0][1]] > 1 and len(contig_appearances)==2:
+                    self.refined_neighbouring_contigs.append(neighbours)          
         return self.refined_neighbouring_contigs
     
     def count_contig_appearance(self, gene_list):
         contig_appearances = {}
         for gene in gene_list:
-            
             if gene in self.genes:
                 if self.genes[gene] not in contig_appearances:
                     contig_appearances[self.genes[gene]] = 1                
