@@ -5,13 +5,12 @@ import sys
 
 class RefineContigNeighbours(object):
     
-    def __init__(self, neighbouring_contigs, filtered_graph, filtered_blast_file, gene_detector):
+    def __init__(self, neighbouring_contigs, filtered_graph, filtered_blast_file):
         self.neighbouring_contigs = neighbouring_contigs
         self.filtered_graph = filtered_graph
         self.filtered_blast_file = filtered_blast_file
         self.genes = GenesToContig(self.filtered_blast_file).genes_to_contig()
         self.refined_neighbouring_contigs = []
-        self.gene_detector = gene_detector
     
     def refine_contig_neighbours(self):
         for neighbours in self.neighbouring_contigs:
