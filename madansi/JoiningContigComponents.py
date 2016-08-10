@@ -17,6 +17,9 @@ class JoiningContigComponents(object):
         return ends_of_components
         
     def add_edges_degree_at_most_two(self):
+        """Looks through the ends of each component of contigs and if the degree of this contig in the unrefined graph is at most two, \
+        will add connections to adjacent contigs if the other contig is also at the end of a different component or is not marked as being \
+        on a component"""
         ordered_contig_graph = nx.Graph()
         ordered_contig_graph.add_edges_from(self.refined_graph.edges())
         ends_of_components = self.list_ends_of_components()
