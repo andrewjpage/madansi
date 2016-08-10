@@ -1,7 +1,6 @@
 import networkx as nx
 from madansi.GenesToContig import GenesToContig
 from madansi.NeighboursOfNodes import NeighboursOfNodes
-import pprint
 import sys
 
 class RefineContigNeighbours(object):
@@ -20,12 +19,7 @@ class RefineContigNeighbours(object):
             if  contig_appearances[neighbours[0][0]] in range(2, neighbours[1] + 4) and contig_appearances[neighbours[0][1]]in range(2, neighbours[1] + 4):
                 if len(contig_appearances)==2:
                     self.refined_neighbouring_contigs.append(neighbours)         
-               # elif len(self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects) == 2 or \
-               #         len(self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects) == 2 and len(contig_appearances)==3:
-               #     self.refined_neighbouring_contigs.append(neighbours)
-        pprint.pprint(self.refined_neighbouring_contigs)
         return self.refined_neighbouring_contigs
-    
     
     def find_contig_appearances(self, neighbours):
         seen_nodes = []
