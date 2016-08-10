@@ -11,6 +11,7 @@ from madansi.FilterBlastComparison import FilterBlastComparison
 from madansi.ContigSpanningTree import ContigSpanningTree
 from madansi.UnusedContigs import UnusedContigs
 from madansi.RefineContigNeighbours import RefineContigNeighbours
+from madansi.RemoveHeaviestEdges import RemoveHeaviestEdges
 
 parser = argparse.ArgumentParser(description = 'Script to take in the input assembly file, blast hits file and graph file and output a list of how each of the \
 contigs are connected to each other and the number of iterations it takes to get between the two.')
@@ -41,12 +42,22 @@ unused_contigs.output_unused_contigs()
 contig_searching = ContigSearching(gene_detector, filtered_graph)
 contig_searching.expand_all_contigs()
 
-#refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file)
-#refine_neighbouring_contigs.refine_contig_neighbours()
+rnc = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file, gene_detector)
+rnc.refine_contig_neighbours()
 
-contig_graph = ContigGraph(contig_searching.neighbouring_contigs, args.output_contig_graph_file)
+contig_graph = ContigGraph(rnc.refined_neighbouring_contigs, args.output_contig_graph_file)
 contig_graph.create_contig_subgraph()
 contig_graph.output_contig_graph()
+
+
+
+#contig_graph = ContigGraph(refine_neighbouring_contigs.refine_contig_neighbours(), 'temp_contig_graph')
+
+
+#rhe = RemoveHeaviestEdges(contig_graph.create_contig_subgraph(), args.output_contig_graph_file)
+#rhe.output_simplified_graph()
+#
+
 
 #contig_spanning_tree = ContigSpanningTree(contig_graph.contig_graph, args.output_spanning_tree)
 #contig_spanning_tree.construct_spanning_tree()
