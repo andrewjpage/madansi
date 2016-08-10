@@ -42,14 +42,11 @@ unused_contigs.output_unused_contigs()
 contig_searching = ContigSearching(gene_detector, filtered_graph)
 contig_searching.expand_all_contigs()
 
-rnc = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file, gene_detector)
-rnc.refine_contig_neighbours()
-
-contig_graph = ContigGraph(rnc.refined_neighbouring_contigs, args.output_contig_graph_file)
+contig_graph = ContigGraph(contig_searching.neighbouring_contigs, args.output_contig_graph_file)
 contig_graph.create_contig_subgraph()
 contig_graph.output_contig_graph()
 
-
+#refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file, gene_detector)
 
 #contig_graph = ContigGraph(refine_neighbouring_contigs.refine_contig_neighbours(), 'temp_contig_graph')
 
