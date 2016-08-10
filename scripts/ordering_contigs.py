@@ -42,10 +42,10 @@ unused_contigs.output_unused_contigs()
 contig_searching = ContigSearching(gene_detector, filtered_graph)
 contig_searching.expand_all_contigs()
 
-rnc = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file, gene_detector)
-rnc.refine_contig_neighbours()
+refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file)
+refine_neighbouring_contigs.refine_contig_neighbours()
 
-contig_graph = ContigGraph(rnc.refined_neighbouring_contigs, args.output_contig_graph_file)
+contig_graph = ContigGraph(refine_neighbouring_contigs.refined_neighbouring_contigs, args.output_contig_graph_file)
 contig_graph.create_contig_subgraph()
 contig_graph.output_contig_graph()
 
@@ -56,6 +56,6 @@ contig_graph.output_contig_graph()
 #rhe.output_simplified_graph()
 
 
- #contig_spanning_tree = ContigSpanningTree(contig_graph.contig_graph, args.output_spanning_tree)
- #contig_spanning_tree.construct_spanning_tree()
+#contig_spanning_tree = ContigSpanningTree(contig_graph.contig_graph, args.output_spanning_tree)
+#contig_spanning_tree.construct_spanning_tree()
  
