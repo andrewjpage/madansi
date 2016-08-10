@@ -20,7 +20,7 @@ parser.add_argument('blast_hits_file', help = 'Path to the blast hits file.', ty
 parser.add_argument('filtered_blast_hits_file', help = 'Path to the output filtered blast hits file.', type = str)
 parser.add_argument('graph_file', help = 'Path to the inout graph file.', type = str)
 parser.add_argument('output_contig_graph_file', help = 'Path to the output contig graph file. This should be a dot file.', type = str)
-parser.add_argument('output_spanning_tree', help = 'Path to the output spanning tree of contigs', type = str)
+# parser.add_argument('output_spanning_tree', help = 'Path to the output spanning tree of contigs', type = str)
 parser.add_argument('output_contig_file', help = 'Path to the file containing the names of the unused contigs', type = str)
 args = parser.parse_args()
 
@@ -42,7 +42,7 @@ unused_contigs.output_unused_contigs()
 contig_searching = ContigSearching(gene_detector, filtered_graph)
 contig_searching.expand_all_contigs()
 
-refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file)
+refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, filtered_graph, args.filtered_blast_hits_file, gene_detector)
 refine_neighbouring_contigs.refine_contig_neighbours()
 
 contig_graph = ContigGraph(refine_neighbouring_contigs.refined_neighbouring_contigs, args.output_contig_graph_file)
