@@ -7,7 +7,6 @@ class NeighboursOfNodes(object):
         self.seen_nodes = []
 
     def find_neighbours(self, node_list):
-        print(self.graph)
         for node in node_list:
             if node in self.graph.nodes():
                 for neighbour in self.graph.neighbors(node):
