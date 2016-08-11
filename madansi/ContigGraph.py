@@ -11,8 +11,8 @@ class ContigGraph(object):
     
     def create_contig_subgraph(self):
         for entry in self.neighbouring_contigs:
-            self.contig_graph.add_nodes_from([entry[0], entry[1]])
-            self.contig_graph.add_edge(entry[0],entry[1], weight = entry[2])
+            self.contig_graph.add_nodes_from([entry[0][0], entry[0][1]])
+            self.contig_graph.add_edge(entry[0][0],entry[0][1], weight = entry[1])
         return self.contig_graph
     
     def output_contig_graph(self): 
