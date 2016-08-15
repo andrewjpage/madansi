@@ -33,13 +33,9 @@ class GraphToFasta(object):
     
     def create_fasta_file(self):
         sequences = self.find_sequences()
-        
         f = open(self.output_fasta_fname, 'w')
-        
         for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
-            print(list(component))
             visited = self.walk_contig_graph(list(component))
-            print(visited)
             for contig in visited:
                 f.write('> ' + contig + '\n')
                 f.write(str(sequences[contig]) + '\n')
