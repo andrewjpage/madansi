@@ -1,5 +1,5 @@
 from madansi.BlastHit import file_reader, BlastHit
-class GenesToContig(object): #Need to distinguish between the cases when the blast file is empty and when it isn't!
+class GenesToContig(object):
     
     def __init__(self, filtered_blast_file):
         self.filtered_blast_file = filtered_blast_file
