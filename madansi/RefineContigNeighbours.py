@@ -19,8 +19,10 @@ class RefineContigNeighbours(object):
     def add_to_contig_appearance(self, gene, contig_appearances):
         if gene in self.genes:
             if self.genes[gene] not in contig_appearances:
-                contig_appearances[self.genes[gene]] = [1, gene]            
-            elif self.genes[gene] in contig_appearances:
+                contig_appearances[self.genes[gene]] = [1,gene]          
+            else:
+                if contig_appearances[self.genes[gene]][0] == 0:
+                    contig_appearances[self.genes[gene]][1] = gene
                 contig_appearances[self.genes[gene]][0] += 1
         return contig_appearances
     
@@ -103,15 +105,17 @@ class RefineContigNeighbours(object):
         return self.refined_neighbouring_contigs
     
     
-    def orientation_of_contigs(self, neighbours):
-        self.refine_contig_neighbours()
+    def orientation_of_contigs(self):
+        self.refined_neighbouring_contigs = self.refine_contig_neighbours()
         for neighbours in self.refined_neighbouring_contigs:
             contig_appearances = self.find_contig_appearances(neighbours)
-
-            self.contig_orientations[neighbours[0][0]][neighbours[0][1]] = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0][1]]].start
-            self.contig_orientations[neighbours[0][1]][neighbours[1][0]] = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1][1]]].start
+            for contig in [neighbours[0][0], neighbours[0][1]]:
+                if contig not in self.contig_orientations:
+                    self.contig_orientations[contig] = {}
+            self.contig_orientations[neighbours[0][0]][neighbours[0][1]] = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].start
+            self.contig_orientations[neighbours[0][1]][neighbours[0][0]] = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].start
         
-        return self.contig_orientation
+        return self.contig_orientations
         
         
         
