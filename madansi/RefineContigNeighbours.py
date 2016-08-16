@@ -1,4 +1,5 @@
 import networkx as nx
+import pprint
 from madansi.GenesToContig import GenesToContig
 from madansi.NeighboursOfNodes import NeighboursOfNodes
 import sys
@@ -14,7 +15,7 @@ class RefineContigNeighbours(object):
         self.gene_detector = gene_detector
         self.contigs = gene_detector.contigs_to_genes()
         self.components_of_contigs = {}
-        self.contig_orientations = {}
+        self.contig_ends = {}
     
     def add_to_contig_appearance(self, gene, contig_appearances):
         if gene in self.genes:
@@ -105,17 +106,19 @@ class RefineContigNeighbours(object):
         return self.refined_neighbouring_contigs
     
     
-    def orientation_of_contigs(self):
+    def ends_of_contigs(self):
         self.refined_neighbouring_contigs = self.refine_contig_neighbours()
         for neighbours in self.refined_neighbouring_contigs:
             contig_appearances = self.find_contig_appearances(neighbours)
             for contig in [neighbours[0][0], neighbours[0][1]]:
-                if contig not in self.contig_orientations:
-                    self.contig_orientations[contig] = {}
-            self.contig_orientations[neighbours[0][0]][neighbours[0][1]] = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].start
-            self.contig_orientations[neighbours[0][1]][neighbours[0][0]] = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].start
-        
-        return self.contig_orientations
+                if contig not in self.contig_ends:
+                    self.contig_ends[contig] = {}
+                
+            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].start
+            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].start
+        pprint.pprint(self.refined_neighbouring_contigs)
+        pprint.pprint(self.contig_ends)
+        return self.contig_ends
         
         
         
