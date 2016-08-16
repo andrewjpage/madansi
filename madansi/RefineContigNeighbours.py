@@ -7,29 +7,32 @@ import sys
 class RefineContigNeighbours(object):
     
     def __init__(self, neighbouring_contigs, filtered_graph, filtered_blast_file, gene_detector):
-        self.neighbouring_contigs = neighbouring_contigs
-        self.filtered_graph = filtered_graph
-        self.filtered_blast_file = filtered_blast_file
-        self.genes = GenesToContig(self.filtered_blast_file).genes_to_contig()
+        self.neighbouring_contigs   = neighbouring_contigs
+        self.filtered_graph         = filtered_graph
+        self.filtered_blast_file    = filtered_blast_file
+        self.genes                  = GenesToContig(self.filtered_blast_file).genes_to_contig()
         self.refined_neighbouring_contigs = []
-        self.gene_detector = gene_detector
-        self.contigs = gene_detector.contigs_to_genes()
-        self.components_of_contigs = {}
-        self.contig_ends = {}
+        self.gene_detector          = gene_detector
+        self.contigs                = gene_detector.contigs_to_genes()
+        self.components_of_contigs  = {}
+        self.contig_ends            = {}
+        self.contig_orientation     = {}
     
     def add_to_contig_appearance(self, gene, contig_appearances):
         if gene in self.genes:
             if self.genes[gene] not in contig_appearances:
-                contig_appearances[self.genes[gene]] = [1,gene]          
+                contig_appearances[self.genes[gene]] = [1,[gene, None]]
             else:
                 if contig_appearances[self.genes[gene]][0] == 0:
-                    contig_appearances[self.genes[gene]][1] = gene
+                    contig_appearances[self.genes[gene]][1] = [gene, None]
+                elif contig_appearances[self.genes[gene]][0] == 1:
+                    contig_appearances[self.genes[gene]][1][1] = gene
                 contig_appearances[self.genes[gene]][0] += 1
         return contig_appearances
     
     def find_contig_appearances(self, neighbours):
         seen_nodes = []
-        contig_appearances = {neighbours[0][0] : [0, None], neighbours[0][1] : [0, None]}
+        contig_appearances = {neighbours[0][0] : [0, [None, None]], neighbours[0][1] : [0, [None,None]]}
         
         
         for intersection in neighbours[2]:
@@ -45,7 +48,7 @@ class RefineContigNeighbours(object):
         
         return contig_appearances
     
-    def create_contig_max_iteration(self):
+    def setup_contig_max_iteration(self):
         """Initialises the maximum contig weight and sets each contig as being on a separate component"""
         contig_count = 0
         contig_max_iteration = {}
@@ -64,16 +67,16 @@ class RefineContigNeighbours(object):
                 return neighbours
 
             elif len(contig_appearances) == 3:
-                if len(self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects) in range(1, neighbours[1] + 3) and \
-                     contig_appearances[neighbours[0][0]][0] == len(self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects):
+                if len(self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects) in range(1, neighbours[1] + 3):
+                    if contig_appearances[neighbours[0][0]][0] == len(self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects):
                         return neighbours
-                elif len(self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects) in range(1, neighbours[1] + 3) and \
-                    contig_appearances[neighbours[0][1]][0] == len(self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects):
+                elif len(self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects) in range(1, neighbours[1] + 3):
+                    if contig_appearances[neighbours[0][1]][0] == len(self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects):
                         return neighbours
             
     def refine_contig_neighbours(self):
         """Removes the case when we have a short contig between two others."""
-        contig_max_iteration = self.create_contig_max_iteration()
+        contig_max_iteration = self.setup_contig_max_iteration()
         for neighbours in sorted(self.neighbouring_contigs, key= lambda x: x[1]):
             if self.check_if_connection_is_valid(neighbours) != None:
                 neighbours = self.check_if_connection_is_valid(neighbours)
@@ -114,26 +117,19 @@ class RefineContigNeighbours(object):
                 if contig not in self.contig_ends:
                     self.contig_ends[contig] = {}
                 
-            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].start
-            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].start
-        pprint.pprint(self.refined_neighbouring_contigs)
-        pprint.pprint(self.contig_ends)
-        return self.contig_ends
+            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].start,\
+                                                                    self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][1]].start)
+            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].start,\
+                                                                    self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][1]].start)
+        return self
+    
         
         
         
         
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
+        
+        
+        
+        
