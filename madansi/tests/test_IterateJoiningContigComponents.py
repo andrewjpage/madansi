@@ -42,6 +42,7 @@ class TestIterateJoiningContigComponents(unittest.TestCase):
         self.assertTrue(nx.is_isomorphic(ordered_contig_graph, unrefined_graph))
     
     def test_finishes_different_to_unrefined_graph(self):
+        """Tests when the final graph is not equal to the unrefined graph"""
         unrefined_graph = nx.Graph()
         initial_refined_graph = nx.Graph()
         final_refined_graph = nx.Graph()
