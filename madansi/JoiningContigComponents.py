@@ -25,12 +25,18 @@ class JoiningContigComponents(object):
         ends_of_components = self.list_ends_of_components()
         for end in ends_of_components:
             if self.unrefined_graph.degree(end)<=2:
-                for edge in self.unrefined_graph.edges(end):
-                    if edge[0] and edge[1] in ends_of_components:
+                for edge in self.unrefined_graph.edges(end, data = True):
+                    if (edge[0] and edge[1]) in ends_of_components:
                         ordered_contig_graph.add_edge(edge[0], edge[1])
                     elif self.contigs_to_components[edge[0]] == None or self.contigs_to_components[edge[1]] == None:
                         ordered_contig_graph.add_edge(edge[0], edge[1])
                         
         return ordered_contig_graph
-        
+    
+    #def add_edges_degree_one(self):
+    #    ordered_contig_graph = self.add_edges()
+    #    for contig in self.unrefined_graph.nodes():
+    #        if  self.unrefined_graph.degree(contig) == 1:
+    #            ordered_contig_graph.add_edge(self.unrefined_graph.edges(contig)[0][0], self.unrefined_graph.edges(contig)[0][1])
+    #    return ordered_contig_graph
     
