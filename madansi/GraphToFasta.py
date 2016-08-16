@@ -16,7 +16,7 @@ class GraphToFasta(object):
         assembly.sequence_names()
         return assembly.sequences
         
-    def find_contigs_degree_one(self, component):
+    def contigs_degree_one(self, component):
         contigs_degree_one = []
         for contig in component:
             if self.graph.degree(contig) == 1:
@@ -26,45 +26,59 @@ class GraphToFasta(object):
     def determine_orientation(self, visited, contig):
         
         if len(self.contig_ends[contig]) == 2:
-            for neighbour in self.graph.neighbors(contig):
-                if neighbour in visited:
-                    visited_contig = neighbour
-                else:
-                    unvisited_contig = neighbour
-            if self.contig_ends[contig][visited_contig] <= self.contig_ends[contig][unvisited_contig]:
-                self.contig_orientation[contig] = 1
-            else:
-                self.contig_orientation[contig] = -1
-        else:
-            
-            
-            self.contig_orientation[contig] = 1
+            self.contig_orientation[contig] = self.determine_orientation_degree_2(visited, contig)  
+        elif len(self.contig_ends[contig]) == 1:
+            self.contig_orientation[contig] = self.determine_orientation_end_contig(contig)
         return self.contig_orientation[contig]
 
+    def determine_orientation_degree_2(self, visited, contig):
+        for neighbour in self.graph.neighbors(contig):
+            if neighbour in visited:
+                visited_contig = neighbour
+            else:
+                unvisited_contig = neighbour
+        if self.contig_ends[contig][visited_contig][0] <= self.contig_ends[contig][unvisited_contig][0]:
+            contig_orientation = 1
+        else:
+            contig_orientation = -1
+        return contig_orientation
+    
+    def determine_orientation_start_contig(self, contig):
+        neighbour = self.graph.neighbors(contig)
+        if self.contig_ends[contig][neighbour[0]][0] >= self.contig_ends[contig][neighbour[0]][1]:
+            contig_orientation = 1
+        else:
+            contig_orientation = -1
+        return contig_orientation
+    
+    def determine_orientation_end_contig(self,contig):
+        neighbour = self.graph.neighbors(contig)
+        if self.contig_ends[contig][neighbour[0]][1] >= self.contig_ends[contig][neighbour[0]][0]:
+            contig_orientation = 1
+        else:
+            contig_orientation = -1
+        return contig_orientation
+    
+    
     def walk_contig_graph(self, component):
-        
-        contigs_degree_one = self.find_contigs_degree_one(component)
+        contigs_degree_one = self.contigs_degree_one(component)
         contig = sorted(contigs_degree_one)[0]
-        self.contig_orientation[contig] = 1
+        self.contig_orientation[contig] = self.determine_orientation_start_contig(contig)
         visited = [contig]
         ends_seen = [contig]
-        
         while self.graph.degree(contig)<= 2 and sorted(visited) != sorted(component):
             for neighbour in self.graph.neighbors(contig):
                 if neighbour not in visited:
                     self.determine_orientation(visited, neighbour)
                     visited.append(neighbour)
                     contig = neighbour
-
         return visited
     
     def create_fasta_file(self):
-        
         sequences = self.find_sequences()
         f = open(self.output_fasta_fname, 'w')
         for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
             visited = self.walk_contig_graph(list(component))
-            pprint.pprint(self.contig_orientation)
             for contig in visited:
                 f.write('>' + contig + '\n')
                 if self.contig_orientation[contig] == 1:
