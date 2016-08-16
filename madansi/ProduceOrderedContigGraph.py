@@ -10,13 +10,14 @@ class ProduceOrderedContigGraph(object):
         self.filtered_graph                 = filtered_graph
         self.filtered_blast_hits_file       = filtered_blast_hits_file
         self.output_refined_contig_graph    = output_refined_contig_graph
+        self.contig_ends                    = {}
     
     def produce_ordered_contig_graph(self):
         contig_searching = ContigSearching(self.gene_detector, self.filtered_graph)
         contig_searching.expand_all_contigs()
         
         refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, self.filtered_graph, self.filtered_blast_hits_file, self.gene_detector)
-        refine_neighbouring_contigs.refine_contig_neighbours()
+        self.contig_ends = refine_neighbouring_contigs.ends_of_contigs()
         
         contig_graph_refined    = ContigGraph(refine_neighbouring_contigs.refined_neighbouring_contigs)
         contig_graph_unrefined  = ContigGraph(contig_searching.neighbouring_contigs)
