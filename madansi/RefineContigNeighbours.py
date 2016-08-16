@@ -110,18 +110,24 @@ class RefineContigNeighbours(object):
     
     
     def ends_of_contigs(self):
-        self.refined_neighbouring_contigs = self.refine_contig_neighbours()
-        for neighbours in self.refined_neighbouring_contigs:
+        pprint.pprint(self.neighbouring_contigs)
+        for neighbours in self.neighbouring_contigs:
             contig_appearances = self.find_contig_appearances(neighbours)
             for contig in [neighbours[0][0], neighbours[0][1]]:
                 if contig not in self.contig_ends:
                     self.contig_ends[contig] = {}
                 
-            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].start,\
+            try:
+                self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].start,\
                                                                     self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][1]].start)
-            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].start,\
+            except KeyError:
+                continue
+            try:
+                self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].start,\
                                                                     self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][1]].start)
-        return self
+            except KeyError:
+                continue
+        return self.contig_ends
     
         
         

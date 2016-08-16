@@ -11,6 +11,8 @@ class GraphToFasta(object):
         self.contig_ends = contig_ends
         self.contig_orientation = {}
 
+    
+
     def find_sequences(self):
         assembly = Assembly(self.input_fasta_file)
         assembly.sequence_names()
@@ -25,9 +27,9 @@ class GraphToFasta(object):
     
     def determine_orientation(self, visited, contig):
         
-        if len(self.contig_ends[contig]) == 2:
+        if len(self.graph.neighbors(contig)) == 2:
             self.contig_orientation[contig] = self.determine_orientation_degree_2(visited, contig)  
-        elif len(self.contig_ends[contig]) == 1:
+        elif len(self.graph.neighbors(contig)) == 1:
             self.contig_orientation[contig] = self.determine_orientation_end_contig(contig)
         return self.contig_orientation[contig]
 
@@ -75,6 +77,7 @@ class GraphToFasta(object):
         return visited
     
     def create_fasta_file(self):
+        pprint.pprint(self.contig_ends)
         sequences = self.find_sequences()
         f = open(self.output_fasta_fname, 'w')
         for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
@@ -90,7 +93,17 @@ class GraphToFasta(object):
     def combine_contigs(self, split_components):
         sequences = self.find_sequences()
         for split_component in split_components:
-            pass
+            combined_contig = ''
+            for contig in split_component:
+                if self.contig_orientation[contig] == 1:
+                    combined_contig.append(str(sequences[contig][0]))
+                else:
+                    combined_contig.append(str(sequences[contig][1]))
+                for i in range(1000):
+                    combined_contig.append('N')
+        return combined_contig
+        
+                
             
             
 
