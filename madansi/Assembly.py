@@ -11,7 +11,7 @@ class Assembly(object):
         with open(self.input_file, "r") as handle:
             for seq_record in SeqIO.parse( handle, "fasta"):
                 sequence_list.append(seq_record.id)
-                self.sequences[seq_record.id] = [seq_record.seq, seq_record.reverse_complement()]
+                self.sequences[seq_record.id] = [seq_record.seq, seq_record.reverse_complement().seq]
             handle.close()
         return sequence_list
        
