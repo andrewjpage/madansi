@@ -31,12 +31,13 @@ class TestGeneDetector(unittest.TestCase):
         self.assertEqual(gene_detector.contigs_to_genes()['Contig3'].gene_objects, {})
         self.assertCountEqual(list(gene_detector.contigs_to_genes()['Contig1'].gene_objects.keys()), ['gene1'])
     
-        my_gene = Gene(-1,402,1,None, 'Contig1')
+        my_gene = Gene(-1,402,1,None, 'Contig1',3)
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].orientation, my_gene.orientation)
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].start, my_gene.start)
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].end, my_gene.end)
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].node, my_gene.node)
         self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].contig, my_gene.contig)
+        self.assertEqual(gene_detector.contigs_to_genes()['Contig1'].gene_objects['gene1'].qry_start, my_gene.qry_start)
         
     def test_contigs_to_genes_four_hits(self):
         """Tests output for multiple blast hits"""

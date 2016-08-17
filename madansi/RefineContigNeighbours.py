@@ -21,16 +21,23 @@ class RefineContigNeighbours(object):
     def add_to_contig_appearance(self, gene, contig_appearances):
         if gene in self.genes:
             if self.genes[gene] not in contig_appearances:
-                contig_appearances[self.genes[gene]] = [1,gene]
+                contig_appearances[self.genes[gene]] = [1,[gene, None]]
             else:
                 if contig_appearances[self.genes[gene]][0] == 0:
-                    contig_appearances[self.genes[gene]][1] = gene
+                    contig_appearances[self.genes[gene]][1] = [gene,None]
+                elif contig_appearances[self.genes[gene]][0] == 1:
+                    contig_appearances[self.genes[gene]][1][1] = gene
                 contig_appearances[self.genes[gene]][0] += 1
+        return contig_appearances
+    
+    def count_contig_appearances(self, gene_list, contig_appearances):
+        for gene in gene_list:
+            contig_appearances = self.add_to_contig_appearance(gene, contig_appearances)
         return contig_appearances
     
     def find_contig_appearances(self, neighbours):
         seen_nodes = []
-        contig_appearances = {neighbours[0][0] : [0, None], neighbours[0][1] : [0, None]}
+        contig_appearances = {neighbours[0][0] : [0, [None, None]], neighbours[0][1] : [0, [None,None]]}
         
         
         for intersection in neighbours[2]:
@@ -114,10 +121,18 @@ class RefineContigNeighbours(object):
                 if contig not in self.contig_ends:
                     self.contig_ends[contig] = {}
             
-            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].start, \
-                                                                    self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].end)
-            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].start,\
-                                                                     self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].end)
+            if contig_appearances[neighbours[0][0]][1][0] != None:
+                qry_start_1 = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].qry_start
+            if contig_appearances[neighbours[0][0]][1][1] != None:
+                qry_start_2 = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][1]].qry_start
+            if contig_appearances[neighbours[0][1]][1][0] != None:
+                qry_start_3 = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].qry_start
+            if contig_appearances[neighbours[0][1]][1][1] != None:
+                qry_start_4 = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][1]].qry_start    
+            
+        
+            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (qry_start_1, qry_start_2)
+            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (qry_start_3, qry_start_4)
 
         return self.contig_ends
     

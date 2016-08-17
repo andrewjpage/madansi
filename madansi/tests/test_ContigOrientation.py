@@ -53,3 +53,9 @@ class TestContigOrientation(unittest.TestCase):
         self.assertEqual(contig_orientation_object.contig_graph.edge['Contig4']['Contig1']['weight'], 2)
         self.assertEqual(contig_orientation_object.contig_graph.edge['Contig1']['Contig3']['weight'], 4)
         
+    def tests_two_components(self):
+        gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/seven_blast_hits')
+        
+        contig_graph = nx.Graph()
+        
+        

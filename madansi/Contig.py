@@ -14,6 +14,6 @@ class Contig(object):
         gene_name = blast_hit.ref_name
         if gene_name in self.gene_objects:
             return False
-        my_gene = Gene(blast_hit.orientation(), blast_hit.ref_start, blast_hit.ref_end, None, self.sequence_name)
+        my_gene = Gene(blast_hit.orientation(), blast_hit.ref_start, blast_hit.ref_end, None, self.sequence_name, blast_hit.qry_start)
         self.gene_objects[gene_name] = my_gene
         return True
