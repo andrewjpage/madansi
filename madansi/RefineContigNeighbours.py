@@ -21,18 +21,16 @@ class RefineContigNeighbours(object):
     def add_to_contig_appearance(self, gene, contig_appearances):
         if gene in self.genes:
             if self.genes[gene] not in contig_appearances:
-                contig_appearances[self.genes[gene]] = [1,[gene, None]]
+                contig_appearances[self.genes[gene]] = [1,gene]
             else:
                 if contig_appearances[self.genes[gene]][0] == 0:
-                    contig_appearances[self.genes[gene]][1] = [gene, None]
-                elif contig_appearances[self.genes[gene]][0] == 1:
-                    contig_appearances[self.genes[gene]][1][1] = gene
+                    contig_appearances[self.genes[gene]][1] = gene
                 contig_appearances[self.genes[gene]][0] += 1
         return contig_appearances
     
     def find_contig_appearances(self, neighbours):
         seen_nodes = []
-        contig_appearances = {neighbours[0][0] : [0, [None, None]], neighbours[0][1] : [0, [None,None]]}
+        contig_appearances = {neighbours[0][0] : [0, None], neighbours[0][1] : [0, None]}
         
         
         for intersection in neighbours[2]:
@@ -110,26 +108,20 @@ class RefineContigNeighbours(object):
     
     
     def ends_of_contigs(self):
-        pprint.pprint(self.neighbouring_contigs)
         for neighbours in self.neighbouring_contigs:
             contig_appearances = self.find_contig_appearances(neighbours)
             for contig in [neighbours[0][0], neighbours[0][1]]:
                 if contig not in self.contig_ends:
                     self.contig_ends[contig] = {}
-                
-            try:
-                self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].start,\
-                                                                    self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][1]].start)
-            except KeyError:
-                continue
-            try:
-                self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].start,\
-                                                                    self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][1]].start)
-            except KeyError:
-                continue
+            
+            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].start, \
+                                                                    self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1]].end)
+            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].start,\
+                                                                     self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1]].end)
+
         return self.contig_ends
     
-        
+                                                                
         
         
         

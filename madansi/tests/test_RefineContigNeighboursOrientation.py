@@ -20,7 +20,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         refine_contig_neighbours_object.genes = {   'gene1':'Contig1', 'gene2':'Contig1', 'gene3':'Contig1',\
                                                     'gene4':'Contig2', 'gene5':'Contig2'}
                                                 
-        expected_dict = {'Contig1': {'Contig2':(404,635)}, 'Contig2': {'Contig1':(1,300)}}
+        expected_dict = {'Contig1': {'Contig2':(404,3)}, 'Contig2': {'Contig1':(1,231)}}
         refine_contig_neighbours_object.ends_of_contigs()
         self.assertDictEqual(refine_contig_neighbours_object.contig_ends, expected_dict) 
     
@@ -30,10 +30,10 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         neighbouring_contigs = []
         
         refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_8_blast_hits_file', gene_detector)
-        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {}), {'Contig1':[1,['gene1', None]]})
-        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[0, [None, None]]}), {'Contig1':[1,['gene1', None]]})
-        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[1, ['gene2', None]]}), {'Contig1':[2,['gene2', 'gene1']]})
-        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[2, ['gene2', 'gene3']]}), {'Contig1':[3,['gene2', 'gene3']]})
+        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {}), {'Contig1':[1,'gene1']})
+        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[0, None]}), {'Contig1':[1,'gene1']})
+        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[1, 'gene2']}), {'Contig1':[2,'gene2']})
+        self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[2, 'gene2']}), {'Contig1':[3,'gene2']})
         
     def test_orientation_of_contigs(self):
         filtered_graph = nx.Graph()
@@ -49,7 +49,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                     'gene4':'Contig2', 'gene5':'Contig2', 'gene6':'Contig3', \
                                     'gene7':'Contig3', 'gene8':'Contig3'}
         refine_contig_neighbours_object.ends_of_contigs()
-        self.assertDictEqual(refine_contig_neighbours_object.contig_ends, {'Contig1': {'Contig2':(404,635)}, 'Contig2':{'Contig1':(1,300), 'Contig3':(300,1)}, 'Contig3':{'Contig2':(1,240)}})
+        self.assertDictEqual(refine_contig_neighbours_object.contig_ends, {'Contig1': {'Contig2':(404,3)}, 'Contig2':{'Contig1':(1,231), 'Contig3':(300,700)}, 'Contig3':{'Contig2':(1,231)}})
     
     def test_orientation_further_separation(self):
         filtered_graph = nx.Graph()
@@ -65,9 +65,9 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                     'gene4':'Contig2', 'gene5':'Contig2', 'gene6':'Contig3', \
                                     'gene7':'Contig3', 'gene8':'Contig3', 'geneA':None, 'geneB':None, 'geneC':None}
         refine_contig_neighbours_object.ends_of_contigs()
-        self.assertDictEqual(refine_contig_neighbours_object.contig_ends, {'Contig1': {'Contig2':(404,635)}, 'Contig2':{'Contig1':(1,300), 'Contig3':(300,1)}, 'Contig3':{'Contig2':(1,240)}})
+        self.assertDictEqual(refine_contig_neighbours_object.contig_ends, {'Contig1': {'Contig2':(404,3)}, 'Contig2':{'Contig1':(1,231), 'Contig3':(300,700)}, 'Contig3':{'Contig2':(1,231)}})
                                                 
-    def                                             
+                                                
                                                 
                                                 
                                                 
