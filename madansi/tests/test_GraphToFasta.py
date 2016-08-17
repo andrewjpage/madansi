@@ -49,14 +49,6 @@ class TestGraphToFasta(unittest.TestCase):
         self.assertTrue(filecmp.cmp('madansi/tests/data/combine_contigs.fa', 'output.fa'))
         os.unlink('output.fa')
     
-    def test_create_fasta_file(self):
-        graph = nx.Graph()
-        graph.add_edges_from([('Contig1', 'Contig3'), ('Contig3', 'Contig2'), ('Contig2', 'Contig4')])
-        contig_ends = {'Contig1':{'Contig3': (1, 100)}, 'Contig3':{'Contig1':(29, 102), 'Contig2':(307, 240)}, 'Contig2':{'Contig3':(1000, 891), 'Contig4':(201, 401)}, 'Contig4':{'Contig2':(49, 300)}}
-        graph_to_fasta = GraphToFasta('madansi/tests/data/assembly_4_sequences.fa', graph, 'output.fa', contig_ends)
-        graph_to_fasta.create_fasta_file()
-        self.assertTrue(filecmp.cmp('madansi/tests/data/expected_ordered_contigs.fa', 'output.fa'))
-        os.unlink('output.fa')
         
     def test_contig_orientation_f_f(self):
         graph = nx.Graph()
