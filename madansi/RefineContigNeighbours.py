@@ -123,13 +123,20 @@ class RefineContigNeighbours(object):
             
             if contig_appearances[neighbours[0][0]][1][0] != None:
                 qry_start_1 = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].qry_start
+            else:
+                qry_start_1 = None
             if contig_appearances[neighbours[0][0]][1][1] != None:
                 qry_start_2 = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][1]].qry_start
+            else:
+                qry_start_2 = None
             if contig_appearances[neighbours[0][1]][1][0] != None:
                 qry_start_3 = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].qry_start
+            else:
+                qry_start_3 = None
             if contig_appearances[neighbours[0][1]][1][1] != None:
                 qry_start_4 = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][1]].qry_start    
-            
+            else:
+                qry_start_4 = None
         
             self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (qry_start_1, qry_start_2)
             self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (qry_start_3, qry_start_4)
