@@ -1,21 +1,18 @@
 import networkx as nx
 from madansi.Assembly import Assembly
-import pprint
+from madansi.RemoveContigs import RemoveContigs
 
 class GraphToFasta(object):
     
     def __init__(self,input_fasta_file, graph, output_fasta_fname, contig_ends):
         self.input_fasta_file = input_fasta_file
-        self.graph = graph
+        self.graph = RemoveContigs(graph).remove_extra_contigs()
         self.output_fasta_fname = output_fasta_fname
         self.contig_ends = contig_ends
         self.contig_orientation = {}
-        self.sequences = self.find_sequences()
-
-    def find_sequences(self):
         assembly = Assembly(self.input_fasta_file)
         assembly.sequence_names()
-        return assembly.sequences
+        self.sequences = assembly.sequences
         
     def contigs_degree_one(self, component):
         contigs_degree_one = []
@@ -62,7 +59,10 @@ class GraphToFasta(object):
     
     def find_start_contig(self, component):
         contigs_degree_one = self.contigs_degree_one(component)
-        start_contig = sorted(contigs_degree_one)[0] 
+        try:
+            start_contig = sorted(contigs_degree_one)[0] 
+        except KeyError:
+            start_contig = component[0]
         self.contig_orientation[start_contig] = self.determine_orientation_start_contig(start_contig)
         return start_contig
     
@@ -97,20 +97,27 @@ class GraphToFasta(object):
         return f
     
     
-    def combine_contigs(self, split_components):
-        sequences = self.find_sequences()
-        for split_component in split_components:
-            combined_contig = ''
-            for contig in split_component:
-                if self.contig_orientation[contig] == 1:
-                    combined_contig.append(str(sequences[contig][0]))
-                else:
-                    combined_contig.append(str(sequences[contig][1]))
-                for i in range(1000):
-                    combined_contig.append('N')
+    def combine_contigs(self, component):
+        combined_contig = ''
+        visited = self.walk_contig_graph(component)
+        for contig in visited:
+            if self.contig_orientation[contig] == 1:
+                combined_contig += str(self.sequences[contig][0])
+            else:
+                combined_contig += str(self.sequences[contig][1])
+            for i in range(1000):
+                combined_contig += 'N'
         return combined_contig
         
-                
+    def create_fasta_file_combined_contigs(self):
+        f = open(self.output_fasta_fname, 'w')
+        contig_count = 1
+        for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
+            combined_contig = self.combine_contigs(component)
+            f.write('>Contig'+ str(contig_count) + '\n')
+            f.write(combined_contig + '\n')
+            contig_count += 1
+        f.close()
             
             
 
