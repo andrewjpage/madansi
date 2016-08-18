@@ -11,7 +11,7 @@ class GraphToFasta(object):
         self.graph = graph
         self.output_fasta_fname = output_fasta_fname
         self.contig_ends = contig_ends
-        pprint.pprint(contig_ends)
+        #pprint.pprint(contig_ends)
         self.contig_orientation = {}
         assembly = Assembly(self.input_fasta_file)
         assembly.sequence_names()
@@ -24,27 +24,37 @@ class GraphToFasta(object):
             if self.graph.degree(contig) == 1:
                 contigs_degree_one.append(contig)
         return contigs_degree_one 
+    
+    def is_cycle(self, component):
+        return len(self.contigs_degree_one(component)) == 0
 
     def find_start_contig(self, component):
         contigs_degree_one = self.contigs_degree_one(component)
-        try:
+        cycle = self.is_cycle(component)
+        if not cycle:
             start_contig = sorted(contigs_degree_one)[0] 
-            self.contig_orientation[start_contig] = DetermineOrientation().determine_orientation_start_contig(start_contig,self.contig_ends, [], self.contig_orientation, self.graph, False, self.sequences)
-        except IndexError:
-            start_contig = sorted(list(component))[0]
-            self.contig_orientation[start_contig] = DetermineOrientation().determine_orientation_start_contig(start_contig,self.contig_ends, [], self.contig_orientation, self.graph, True, self.sequences)
+            self.contig_orientation[start_contig] = DetermineOrientation().determine_orientation_start_contig(start_contig,self.contig_ends, [], self.contig_orientation, self.graph, cycle, self.sequences)
+        else:
+            start_contig = sorted(list(component))[0]                      
+            self.contig_orientation[start_contig] = 1
         return start_contig
     
     def walk_contig_graph(self, component):
         contig = self.find_start_contig(component)
         visited = [contig]
-        ends_seen = [contig]
-        while self.graph.degree(contig)<= 2 and sorted(visited) != sorted(component):
-            for neighbour in self.graph.neighbors(contig):
-                if neighbour not in visited:
-                    DetermineOrientation().determine_orientation(neighbour, self.contig_ends, visited, self.contig_orientation, self.graph, False, self.sequences)
-                    visited.append(neighbour)
-                    contig = neighbour
+        orientation_assigned = [contig]
+        while sorted(orientation_assigned) != sorted(component):
+            if len(visited) == 1 and self.is_cycle(component):
+                neighbour = DetermineOrientation().determine_initial_direction_cycle(contig, self.contig_ends, visited, self.contig_orientation, self.graph, True, self.sequences)
+                DetermineOrientation().determine_orientation(neighbour, self.contig_ends, visited, self.contig_orientation, self.graph, False, self.sequences)
+            else:
+                for neighbour in self.graph.neighbors(contig):
+                    if neighbour not in visited:
+                        DetermineOrientation().determine_orientation(neighbour, self.contig_ends, visited, self.contig_orientation, self.graph, False, self.sequences)
+                        break
+            orientation_assigned.append(neighbour)
+            visited.append(neighbour)
+            contig = neighbour
         return visited
         
     def combine_contigs(self, component, contig_count):
@@ -61,7 +71,7 @@ class GraphToFasta(object):
                     combined_contig += 'N'
             count += 1
         self.combined_contigs_dict[contig_count] = visited
-        pprint.pprint(self.combined_contigs_dict)
+        #pprint.pprint(self.combined_contigs_dict)
         return combined_contig
         
     def create_fasta_file_combined_contigs(self):

@@ -37,4 +37,35 @@ class TestGraphToFasta(unittest.TestCase):
         self.assertTrue(filecmp.cmp('madansi/tests/data/combine_contigs.fa', 'output.fa'))
         os.unlink('output.fa')
     
-   
+    def test_3_cycle_f_f_f(self):
+        graph = nx.Graph()
+        graph.add_edges_from([('Contig1', 'Contig2'), ('Contig2', 'Contig3'), ('Contig3', 'Contig1')])
+        contig_ends = {'Contig1':{'Contig2':(100,1), 'Contig3':(1,100)}, 'Contig2':{'Contig1':(1,100), 'Contig3':(100,1)}, 'Contig3':{'Contig1':(100,1), 'Contig2':(1,100)}}
+        
+        graph_to_fasta = GraphToFasta('madansi/tests/data/assembly_7_sequences.fa', graph, 'output.fa', contig_ends)
+        
+        
+        self.assertEqual(graph_to_fasta.walk_contig_graph(['Contig2', 'Contig1', 'Contig3']), ['Contig1', 'Contig2', 'Contig3'])
+        self.assertDictEqual(graph_to_fasta.contig_orientation, {'Contig1':1, 'Contig2':1, 'Contig3':1})
+        
+    def test_3_cycle_r_r_r(self):
+        graph = nx.Graph()
+        graph.add_edges_from([('Contig1', 'Contig2'), ('Contig2', 'Contig3'), ('Contig3', 'Contig1')])
+        contig_ends = {'Contig1':{'Contig2':(1,100), 'Contig3':(100,1)}, 'Contig2':{'Contig1':(100,1), 'Contig3':(1,100)}, 'Contig3':{'Contig1':(1,100), 'Contig2':(100,1)}}
+        
+        graph_to_fasta = GraphToFasta('madansi/tests/data/assembly_7_sequences.fa', graph, 'output.fa', contig_ends)
+        
+        self.assertEqual(graph_to_fasta.walk_contig_graph(['Contig2', 'Contig1', 'Contig3']), ['Contig1', 'Contig3', 'Contig2'])
+        self.assertDictEqual(graph_to_fasta.contig_orientation, {'Contig1':1, 'Contig2':1, 'Contig3':1})
+        
+    def test_3_cycle_f_r_f(self):
+        graph = nx.Graph()
+        graph.add_edges_from([('Contig1', 'Contig2'), ('Contig2', 'Contig3'), ('Contig3', 'Contig1')])
+        contig_ends = {'Contig1':{'Contig2':(100,1), 'Contig3':(1,100)}, 'Contig2':{'Contig1':(100,1), 'Contig3':(1,100)}, 'Contig3':{'Contig1':(100,1), 'Contig2':(1,100)}}
+        
+        graph_to_fasta = GraphToFasta('madansi/tests/data/assembly_7_sequences.fa', graph, 'output.fa', contig_ends)
+        
+        
+        self.assertEqual(graph_to_fasta.walk_contig_graph(['Contig2', 'Contig1', 'Contig3']), ['Contig1', 'Contig2', 'Contig3'])
+        self.assertDictEqual(graph_to_fasta.contig_orientation, {'Contig1':1, 'Contig2':-1, 'Contig3':1})
+        

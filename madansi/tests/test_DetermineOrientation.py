@@ -59,3 +59,7 @@ class TestDetermineOrientation(unittest.TestCase):
         self.assertEqual(DetermineOrientation().determine_orientation_start_contig('Contig1', contig_ends, [], {}, graph, False, {}), -1)
         self.assertEqual(DetermineOrientation().determine_orientation_end_contig('Contig2', contig_ends, ['Contig1'], {}, graph, False, {}), 1)
     
+        
+        
+        
+        

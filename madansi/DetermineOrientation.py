@@ -46,20 +46,21 @@ class DetermineOrientation(object):
                 else:
                     return -1  
     
-    def determine_orientation_linear(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+    def determine_orientation(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
         if len(graph.neighbors(contig)) == 2:
             contig_orientation[contig] = self.determine_orientation_degree_2(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)  
         elif len(graph.neighbors(contig)) == 1:
             contig_orientation[contig] = self.determine_orientation_end_contig(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)
         return contig_orientation[contig]
 
-    def determine_orientation_cycle(self):
-        pass
-    
-    def determine_orientation(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
-        if cycle:
-            return self.determine_orientation_cycle(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)
+    def determine_initial_direction_cycle(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+        neighbours = graph.neighbors(contig)
+        if contig_ends[contig][neighbours[0]][0] >= contig_ends[contig][neighbours[1]][0]:
+            next_neighbour = neighbours[0]
         else:
-            return self.determine_orientation_linear(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)
+            next_neighbour = neighbours[1]
+        contig_orientation[contig] = 1
+        return next_neighbour
+
 
                     
