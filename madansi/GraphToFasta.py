@@ -32,13 +32,13 @@ class GraphToFasta(object):
         return self.contig_orientation[contig]
 
     def determine_orientation_degree_2(self, visited, contig):
+        previous_contig = visited[len(visited) - 1]
+        
         for neighbour in self.graph.neighbors(contig):
-            if neighbour in visited:
-                visited_contig = neighbour
-            else:
-                unvisited_contig = neighbour
+            if neighbour != previous_contig:
+                next_contig = neighbour
         try:
-            if self.contig_ends[contig][visited_contig][0] <= self.contig_ends[contig][unvisited_contig][0]:
+            if self.contig_ends[contig][previous_contig][0] <= self.contig_ends[contig][next_contig][0]:
                 return 1
             else:
                 return -1
@@ -86,8 +86,8 @@ class GraphToFasta(object):
         contigs_degree_one = self.contigs_degree_one(component)
         try:
             start_contig = sorted(contigs_degree_one)[0] 
-        except KeyError:
-            start_contig = component[0]
+        except IndexError:
+            start_contig = sorted(list(component))[0]
         self.contig_orientation[start_contig] = self.determine_orientation_start_contig(start_contig)
         return start_contig
     
@@ -117,6 +117,7 @@ class GraphToFasta(object):
                     combined_contig += 'N'
             count += 1
         self.combined_contigs_dict[contig_count] = visited
+        pprint.pprint(self.combined_contigs_dict)
         return combined_contig
         
     def create_fasta_file_combined_contigs(self):
