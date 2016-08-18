@@ -1,5 +1,6 @@
 import networkx as nx
 from madansi.Assembly import Assembly
+from madansi.DetermineOrientation import DetermineOrientation
 import pprint
 import sys
 
@@ -10,6 +11,7 @@ class GraphToFasta(object):
         self.graph = graph
         self.output_fasta_fname = output_fasta_fname
         self.contig_ends = contig_ends
+        pprint.pprint(contig_ends)
         self.contig_orientation = {}
         assembly = Assembly(self.input_fasta_file)
         assembly.sequence_names()
@@ -21,74 +23,16 @@ class GraphToFasta(object):
         for contig in component:
             if self.graph.degree(contig) == 1:
                 contigs_degree_one.append(contig)
-        return contigs_degree_one
-    
-    def determine_orientation(self, visited, contig):
-        
-        if len(self.graph.neighbors(contig)) == 2:
-            self.contig_orientation[contig] = self.determine_orientation_degree_2(visited, contig)  
-        elif len(self.graph.neighbors(contig)) == 1:
-            self.contig_orientation[contig] = self.determine_orientation_end_contig(contig)
-        return self.contig_orientation[contig]
+        return contigs_degree_one 
 
-    def determine_orientation_degree_2(self, visited, contig):
-        previous_contig = visited[len(visited) - 1]
-        
-        for neighbour in self.graph.neighbors(contig):
-            if neighbour != previous_contig:
-                next_contig = neighbour
-        try:
-            if self.contig_ends[contig][previous_contig][0] <= self.contig_ends[contig][next_contig][0]:
-                return 1
-            else:
-                return -1
-            
-        except TypeError:
-            print(contig)
-            pprint.pprint(self.contig_ends)
-            sys.exit()
-        
-    
-    def determine_orientation_start_contig(self, contig):
-        neighbour = self.graph.neighbors(contig)
-        try:
-            if self.contig_ends[contig][neighbour[0]][0] >= self.contig_ends[contig][neighbour[0]][1]:
-                return 1
-            else:
-                return -1
-            
-        except TypeError:
-            if self.contig_ends[contig][neighbour[0]][1] == None:
-                if self.contig_ends[contig][neighbour[0]][0] <= self.sequences[contig][2]/2:
-                    return -1
-                else:
-                    return 1
-            
-        
-    
-    def determine_orientation_end_contig(self,contig):
-        neighbour = self.graph.neighbors(contig)
-        try:
-            if self.contig_ends[contig][neighbour[0]][1] >= self.contig_ends[contig][neighbour[0]][0]:
-                return 1
-            else:
-                return -1
-            
-        except TypeError:
-            if self.contig_ends[contig][neighbour[0]][1] == None:
-                if self.contig_ends[contig][neighbour[0]][0] <= self.sequences[contig][2]/2:
-                    return 1
-                else:
-                    return -1
-        
-    
     def find_start_contig(self, component):
         contigs_degree_one = self.contigs_degree_one(component)
         try:
             start_contig = sorted(contigs_degree_one)[0] 
+            self.contig_orientation[start_contig] = DetermineOrientation().determine_orientation_start_contig(start_contig,self.contig_ends, [], self.contig_orientation, self.graph, False, self.sequences)
         except IndexError:
             start_contig = sorted(list(component))[0]
-        self.contig_orientation[start_contig] = self.determine_orientation_start_contig(start_contig)
+            self.contig_orientation[start_contig] = DetermineOrientation().determine_orientation_start_contig(start_contig,self.contig_ends, [], self.contig_orientation, self.graph, True, self.sequences)
         return start_contig
     
     def walk_contig_graph(self, component):
@@ -98,7 +42,7 @@ class GraphToFasta(object):
         while self.graph.degree(contig)<= 2 and sorted(visited) != sorted(component):
             for neighbour in self.graph.neighbors(contig):
                 if neighbour not in visited:
-                    self.determine_orientation(visited, neighbour)
+                    DetermineOrientation().determine_orientation(neighbour, self.contig_ends, visited, self.contig_orientation, self.graph, False, self.sequences)
                     visited.append(neighbour)
                     contig = neighbour
         return visited

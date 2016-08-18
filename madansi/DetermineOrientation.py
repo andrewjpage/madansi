@@ -1,39 +1,65 @@
-class DetermineOrientation(object):
-    def __init__(self,contig, visited,contig_orientation):
-        
-    
-    def determine_orientation(self, visited, contig):
-        
-        if len(self.graph.neighbors(contig)) == 2:
-            self.contig_orientation[contig] = self.determine_orientation_degree_2(visited, contig)  
-        elif len(self.graph.neighbors(contig)) == 1:
-            self.contig_orientation[contig] = self.determine_orientation_end_contig(contig)
-        return self.contig_orientation[contig]
+import networkx as nx
+from madansi.Assembly import Assembly
 
-    def determine_orientation_degree_2(self, visited, contig):
-        for neighbour in self.graph.neighbors(contig):
-            if neighbour in visited:
-                visited_contig = neighbour
+class DetermineOrientation(object):
+    def __init__(self):
+        pass
+
+    def determine_orientation_degree_2(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+        previous_contig = visited[len(visited) - 1]
+        for neighbour in graph.neighbors(contig):
+            if neighbour != previous_contig:
+                next_contig = neighbour
+        try:
+            if contig_ends[contig][previous_contig][0] <= contig_ends[contig][next_contig][0]:
+                return 1
             else:
-                unvisited_contig = neighbour
-        if self.contig_ends[contig][visited_contig][0] <= self.contig_ends[contig][unvisited_contig][0]:
-            contig_orientation = 1
-        else:
-            contig_orientation = -1
-        return contig_orientation
+                return -1
+        except TypeError:
+            sys.exit()
     
-    def determine_orientation_start_contig(self, contig):
-        neighbour = self.graph.neighbors(contig)
-        if self.contig_ends[contig][neighbour[0]][0] >= self.contig_ends[contig][neighbour[0]][1]:
-            contig_orientation = 1
-        else:
-            contig_orientation = -1
-        return contig_orientation
+    def determine_orientation_start_contig(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+        neighbour = graph.neighbors(contig)
+        try:
+            if contig_ends[contig][neighbour[0]][0] >= contig_ends[contig][neighbour[0]][1]:
+                return 1
+            else:
+                return -1
+        except TypeError:
+            if contig_ends[contig][neighbour[0]][1] == None:
+                if contig_ends[contig][neighbour[0]][0] <= sequences[contig][2]/2:
+                    return -1
+                else:
+                    return 1
+            
+    def determine_orientation_end_contig(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+        neighbour = graph.neighbors(contig)
+        try:
+            if contig_ends[contig][neighbour[0]][1] >= contig_ends[contig][neighbour[0]][0]:
+                return 1
+            else:
+                return -1
+        except TypeError:
+            if contig_ends[contig][neighbour[0]][1] == None:
+                if contig_ends[contig][neighbour[0]][0] <= sequences[contig][2]/2:
+                    return 1
+                else:
+                    return -1  
     
-    def determine_orientation_end_contig(self,contig):
-        neighbour = self.graph.neighbors(contig)
-        if self.contig_ends[contig][neighbour[0]][1] >= self.contig_ends[contig][neighbour[0]][0]:
-            contig_orientation = 1
+    def determine_orientation_linear(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+        if len(graph.neighbors(contig)) == 2:
+            contig_orientation[contig] = self.determine_orientation_degree_2(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)  
+        elif len(graph.neighbors(contig)) == 1:
+            contig_orientation[contig] = self.determine_orientation_end_contig(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)
+        return contig_orientation[contig]
+
+    def determine_orientation_cycle(self):
+        pass
+    
+    def determine_orientation(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
+        if cycle:
+            return self.determine_orientation_cycle(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)
         else:
-            contig_orientation = -1
-        return contig_orientation
+            return self.determine_orientation_linear(contig, contig_ends, visited,contig_orientation, graph, cycle, sequences)
+
+                    
