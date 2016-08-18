@@ -1,5 +1,7 @@
 import networkx as nx
 from madansi.Assembly import Assembly
+import pprint
+import sys
 
 class GraphToFasta(object):
     
@@ -35,27 +37,50 @@ class GraphToFasta(object):
                 visited_contig = neighbour
             else:
                 unvisited_contig = neighbour
-        if self.contig_ends[contig][visited_contig][0] <= self.contig_ends[contig][unvisited_contig][0]:
-            contig_orientation = 1
-        else:
-            contig_orientation = -1
-        return contig_orientation
+        try:
+            if self.contig_ends[contig][visited_contig][0] <= self.contig_ends[contig][unvisited_contig][0]:
+                return 1
+            else:
+                return -1
+            
+        except TypeError:
+            print(contig)
+            pprint.pprint(self.contig_ends)
+            sys.exit()
+        
     
     def determine_orientation_start_contig(self, contig):
         neighbour = self.graph.neighbors(contig)
-        if self.contig_ends[contig][neighbour[0]][0] >= self.contig_ends[contig][neighbour[0]][1]:
-            contig_orientation = 1
-        else:
-            contig_orientation = -1
-        return contig_orientation
+        try:
+            if self.contig_ends[contig][neighbour[0]][0] >= self.contig_ends[contig][neighbour[0]][1]:
+                return 1
+            else:
+                return -1
+            
+        except TypeError:
+            if self.contig_ends[contig][neighbour[0]][1] == None:
+                if self.contig_ends[contig][neighbour[0]][0] <= self.sequences[contig][2]/2:
+                    return -1
+                else:
+                    return 1
+            
+        
     
     def determine_orientation_end_contig(self,contig):
         neighbour = self.graph.neighbors(contig)
-        if self.contig_ends[contig][neighbour[0]][1] >= self.contig_ends[contig][neighbour[0]][0]:
-            contig_orientation = 1
-        else:
-            contig_orientation = -1
-        return contig_orientation
+        try:
+            if self.contig_ends[contig][neighbour[0]][1] >= self.contig_ends[contig][neighbour[0]][0]:
+                return 1
+            else:
+                return -1
+            
+        except TypeError:
+            if self.contig_ends[contig][neighbour[0]][1] == None:
+                if self.contig_ends[contig][neighbour[0]][0] <= self.sequences[contig][2]/2:
+                    return 1
+                else:
+                    return -1
+        
     
     def find_start_contig(self, component):
         contigs_degree_one = self.contigs_degree_one(component)
@@ -81,13 +106,16 @@ class GraphToFasta(object):
     def combine_contigs(self, component, contig_count):
         combined_contig = ''
         visited = self.walk_contig_graph(component)
+        count = 1
         for contig in visited:
             if self.contig_orientation[contig] == 1:
                 combined_contig += str(self.sequences[contig][0])
             else:
                 combined_contig += str(self.sequences[contig][1])
-            for i in range(1000):
-                combined_contig += 'N'
+            if count != len(visited):
+                for i in range(200):
+                    combined_contig += 'N'
+            count += 1
         self.combined_contigs_dict[contig_count] = visited
         return combined_contig
         
@@ -101,9 +129,3 @@ class GraphToFasta(object):
             contig_count += 1
         f.close()
             
-            
-
-            
-    
-
-        
