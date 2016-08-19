@@ -6,17 +6,18 @@ import sys
 
 class RefineContigNeighbours(object):
     
-    def __init__(self, neighbouring_contigs, filtered_graph, filtered_blast_file, gene_detector):
-        self.neighbouring_contigs   = neighbouring_contigs
-        self.filtered_graph         = filtered_graph
-        self.filtered_blast_file    = filtered_blast_file
-        self.genes                  = GenesToContig(self.filtered_blast_file).genes_to_contig()
-        self.refined_neighbouring_contigs = []
-        self.gene_detector          = gene_detector
-        self.contigs                = gene_detector.contigs_to_genes()
-        self.components_of_contigs  = {}
-        self.contig_ends            = {}
-        self.contig_orientation     = {}
+    def __init__(self, neighbouring_contigs, filtered_graph, filtered_blast_file, gene_detector, sequences):
+        self.neighbouring_contigs           = neighbouring_contigs
+        self.filtered_graph                 = filtered_graph
+        self.filtered_blast_file            = filtered_blast_file
+        self.genes                          = GenesToContig(self.filtered_blast_file).genes_to_contig()
+        self.refined_neighbouring_contigs   = []
+        self.gene_detector                  = gene_detector
+        self.contigs                        = gene_detector.contigs_to_genes()
+        self.components_of_contigs          = {}
+        self.contig_ends                    = {}
+        self.contig_orientation             = {}
+        self.sequences                      = sequences
     
     def add_to_contig_appearance(self, gene, contig_appearances, iteration):
         if gene in self.genes:
@@ -121,31 +122,12 @@ class RefineContigNeighbours(object):
             for contig in [neighbours[0][0], neighbours[0][1]]:
                 if contig not in self.contig_ends:
                     self.contig_ends[contig] = {}
-            
-            if self.check_for_one_gene(neighbours, contig_appearances, 0) != False:
-                self.contig_ends[neighbours[0][0]][neighbours[0][1]] = self.check_for_one_gene(neighbours, contig_appearances, 0)
-            if self.check_for_one_gene(neighbours, contig_appearances, 1) != False:
-                self.contig_ends[neighbours[0][1]][neighbours[0][0]] = self.check_for_one_gene(neighbours, contig_appearances, 1)
-            
-    
+                    
+            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = self.getting_query_start_tuples(neighbours, contig_appearances, 0)
+            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = self.getting_query_start_tuples(neighbours, contig_appearances, 1)
+
         return self.contig_ends
     
-    def check_for_one_gene(self, neighbours, contig_appearances, int):
-        count = 0
-        qry_starts = []
-        for i in sorted(contig_appearances[neighbours[0][int]][1].keys()):
-            if len(contig_appearances[neighbours[0][int]][1][i]) == 1:
-                qry_starts.append(self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects[contig_appearances[neighbours[0][int]][1][i][0]].qry_start)
-                count = count + 1   
-            else:
-                genes_degree_at_least_two = self.remove_gene_degree_one(neighbours, contig_appearances, int, i)
-                if len(genes_degree_at_least_two) == 1:
-                    qry_starts.append(self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects[genes_degree_at_least_two[0]].qry_start)
-                    count = count + 1 
-            if count == 2:
-                return qry_starts
-                
-        return False
     
     def remove_gene_degree_one(self, neighbours, contig_appearances, int, i):
         genes_degree_at_least_2 = []
@@ -154,6 +136,59 @@ class RefineContigNeighbours(object):
                 genes_degree_at_least_2.append(gene)
         return genes_degree_at_least_2
                         
+    
+    def getting_query_start_tuples(self, neighbours, contig_appearances, int):
+        qry_starts = []
+        iteration_gene_dict = contig_appearances[neighbours[0][int]][1]
+        iterations = sorted(iteration_gene_dict.keys())
+        gene_objects = self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects
+        genes_degree_at_least_2_first_iteration = self.remove_gene_degree_one(neighbours, contig_appearances, int, iterations[0])
+        
+        
+        if len(genes_degree_at_least_2_first_iteration) == 1:
+            genes_degree_at_least_2_second_iteration = self.remove_gene_degree_one(neighbours, contig_appearances, int, iterations[1])
+            if len(genes_degree_at_least_2_second_iteration) == 1:
+                qry_starts.append(gene_objects[genes_degree_at_least_2_first_iteration[0]].qry_start)    
+                qry_starts.append(gene_objects[genes_degree_at_least_2_second_iteration[0]].qry_start)
+                return qry_starts
+            else:
+                if  all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start < \
+                        gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start \
+                        for i in range(len(iteration_gene_dict[iterations[1]]))) or \
+                    all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
+                        gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start \
+                        for i in range(len(iteration_gene_dict[iterations[1]]))):
+                            qry_starts.append(gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start)    
+                            qry_starts.append(gene_objects[iteration_gene_dict[iterations[1]][0]].qry_start)
+                            return qry_starts
+                else:
+                    if gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start < sequence_length/2:
+                        return [1, sequence_length]
+                    else:
+                        return [sequence_length, 1]
+        else:
+            sequence_length = self.sequences[neighbours[0][int]][2]
+            if all(gene_objects[iteration_gene_dict[iterations[0]][i]].qry_start < \
+                    sequence_length/2 for i in range(len(iteration_gene_dict[iterations[0]]))):
+                    return [1, sequence_length]
+            elif all(gene_objects[iteration_gene_dict[iterations[0]][i]].qry_start >= \
+                    sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
+                    return [sequence_length, 1]
+            else:
+                if len(iterations) > 1:
+                    if all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start < \
+                        sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
+                        return [1, sequence_length]
+                    elif all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
+                        sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
+                        return [sequence_length, 1]
+                    else:
+                        return [None, None]
+    
+    
+    
+    
+    
     
         
         
