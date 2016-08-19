@@ -18,40 +18,41 @@ class RefineContigNeighbours(object):
         self.contig_ends            = {}
         self.contig_orientation     = {}
     
-    def add_to_contig_appearance(self, gene, contig_appearances):
+    def add_to_contig_appearance(self, gene, contig_appearances, iteration):
         if gene in self.genes:
             if self.genes[gene] not in contig_appearances:
-                contig_appearances[self.genes[gene]] = [1,[gene, None]]
+                contig_appearances[self.genes[gene]] = [1, {iteration:[gene]}]
             else:
-                if contig_appearances[self.genes[gene]][0] == 0:
-                    contig_appearances[self.genes[gene]][1] = [gene,None]
-                elif contig_appearances[self.genes[gene]][0] == 1:
-                    contig_appearances[self.genes[gene]][1][1] = gene
                 contig_appearances[self.genes[gene]][0] += 1
+                if iteration in contig_appearances[self.genes[gene]][1]:
+                    contig_appearances[self.genes[gene]][1][iteration].append(gene)
+                    contig_appearances[self.genes[gene]][1][iteration].sort()
+                else:
+                    contig_appearances[self.genes[gene]][1][iteration] = [gene]
         return contig_appearances
     
-    def count_contig_appearances(self, gene_list, contig_appearances):
-        for gene in gene_list:
-            contig_appearances = self.add_to_contig_appearance(gene, contig_appearances)
-        return contig_appearances
+    #def count_contig_appearances(self, gene_list, contig_appearances):
+    #    for gene in gene_list:
+    #        contig_appearances = self.add_to_contig_appearance(gene, contig_appearances)
+    #    return contig_appearances
     
     def find_contig_appearances(self, neighbours):
         seen_nodes = []
-        contig_appearances = {neighbours[0][0] : [0, [None, None]], neighbours[0][1] : [0, [None,None]]}
-        
+        contig_appearances = {neighbours[0][0] : [0, {}], neighbours[0][1] : [0,{}]}
         
         for intersection in neighbours[2]:
             seen_nodes.append(intersection)
-            self.add_to_contig_appearance(intersection, contig_appearances)
+            self.add_to_contig_appearance(intersection, contig_appearances,0)
             
         for i in range(neighbours[1] + 2):
             neighbouring_nodes = NeighboursOfNodes(self.filtered_graph).find_neighbours(seen_nodes)
             
             for neighbour_node in neighbouring_nodes:
                 seen_nodes.append(neighbour_node)
-                self.add_to_contig_appearance(neighbour_node, contig_appearances)
+                self.add_to_contig_appearance(neighbour_node, contig_appearances, i + 1)
         
         return contig_appearances
+    
     
     def setup_contig_max_iteration(self):
         """Initialises the maximum contig weight and sets each contig as being on a separate component"""
@@ -121,34 +122,39 @@ class RefineContigNeighbours(object):
                 if contig not in self.contig_ends:
                     self.contig_ends[contig] = {}
             
-            if contig_appearances[neighbours[0][0]][1][0] != None:
-                qry_start_1 = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][0]].qry_start
-            else:
-                qry_start_1 = None
-            if contig_appearances[neighbours[0][0]][1][1] != None:
-                qry_start_2 = self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects[contig_appearances[neighbours[0][0]][1][1]].qry_start
-            else:
-                qry_start_2 = None
-            if contig_appearances[neighbours[0][1]][1][0] != None:
-                qry_start_3 = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][0]].qry_start
-            else:
-                qry_start_3 = None
-            if contig_appearances[neighbours[0][1]][1][1] != None:
-                qry_start_4 = self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects[contig_appearances[neighbours[0][1]][1][1]].qry_start    
-            else:
-                qry_start_4 = None
-        
-            self.contig_ends[neighbours[0][0]][neighbours[0][1]] = (qry_start_1, qry_start_2)
-            self.contig_ends[neighbours[0][1]][neighbours[0][0]] = (qry_start_3, qry_start_4)
-
+            if self.check_for_one_gene(neighbours, contig_appearances, 0) != False:
+                self.contig_ends[neighbours[0][0]][neighbours[0][1]] = self.check_for_one_gene(neighbours, contig_appearances, 0)
+            if self.check_for_one_gene(neighbours, contig_appearances, 1) != False:
+                self.contig_ends[neighbours[0][1]][neighbours[0][0]] = self.check_for_one_gene(neighbours, contig_appearances, 1)
+            
+    
         return self.contig_ends
     
-                                                                
-        
-        
-        
-        
-        
+    def check_for_one_gene(self, neighbours, contig_appearances, int):
+        count = 0
+        qry_starts = []
+        for i in sorted(contig_appearances[neighbours[0][int]][1].keys()):
+            if len(contig_appearances[neighbours[0][int]][1][i]) == 1:
+                qry_starts.append(self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects[contig_appearances[neighbours[0][int]][1][i][0]].qry_start)
+                count = count + 1   
+            else:
+                genes_degree_at_least_two = self.remove_gene_degree_one(neighbours, contig_appearances, int, i)
+                if len(genes_degree_at_least_two) == 1:
+                    qry_starts.append(self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects[genes_degree_at_least_two[0]].qry_start)
+                    count = count + 1 
+            if count == 2:
+                return qry_starts
+                
+        return False
+    
+    def remove_gene_degree_one(self, neighbours, contig_appearances, int, i):
+        genes_degree_at_least_2 = []
+        for gene in contig_appearances[neighbours[0][int]][1][i]:
+            if self.filtered_graph.degree(gene) != 1:
+                genes_degree_at_least_2.append(gene)
+        return genes_degree_at_least_2
+                        
+    
         
         
         
