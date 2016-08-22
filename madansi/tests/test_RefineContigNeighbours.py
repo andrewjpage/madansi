@@ -165,4 +165,21 @@ class TestRefineContigNeighbours(unittest.TestCase):
                                                                                                         'Contig2':[2, {1:['gene4'], 2:['gene5']}],\
                                                                                                         'Contig3':[1, {3:['gene6']}]})
         
-        
+    def test_loop_of_genes_between_contigs(self):
+        filtered_graph = nx.Graph()
+        filtered_graph.add_edges_from([('gene1', 'gene2'), ('gene2', 'gene3'), ('gene3', 'geneA'), ('geneA', 'geneB'), ('geneB', 'gene4'), ('gene4', 'gene5'),\
+                                        ('gene3', 'gene6'), ('gene6', 'gene7'), ('gene7', 'gene8'), ('gene8', 'gene9'), ('gene9', 'geneB')])
+        neighbouring_contigs = [[('Contig1', 'Contig2'),2, ['geneA', 'geneB']], [('Contig2', 'Contig3'), 1, ['geneB']], [('Contig1', 'Contig3'),1,['geneA']]]
+        gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
+        refine_contig_neighbours = RefineContigNeighbours(neighbouring_contigs, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {})
+        expected_neighbours = [[('Contig2', 'Contig3'), 1, ['geneB']], [('Contig1', 'Contig3'),1,['geneA']]]
+        self.assertEqual(sorted(refine_contig_neighbours.refine_contig_neighbours()), sorted(expected_neighbours))
+    
+    def test_most_occurent_contig_not_in_neighbours(self):
+        filtered_graph = nx.Graph()
+        filtered_graph.add_edges_from([('gene1', 'gene2'), ('gene2', 'gene4'), ('gene4', 'gene5'), ('gene2', 'gene6'), ('gene6', 'gene7'), ('gene7', 'gene8'), ('gene4', 'gene8')])
+        neighbouring_contigs = [[('Contig1', 'Contig2'),1,['gene2','gene4']]]
+        gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
+        refine_contig_neighbours = RefineContigNeighbours(neighbouring_contigs, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {})
+        self.assertEqual(sorted(refine_contig_neighbours.refine_contig_neighbours()), [])
+    

@@ -9,7 +9,7 @@ class GraphParser(object):
     def filter_graph(self, graph):
         edges_to_remove = []
         for node in graph.nodes_iter():
-            if graph.degree(node) >= 5:
+            if graph.degree(node) >= 4:
                 edge_list = graph.edges(node, data=True)
                 max_weight = max([d['weight'] for u,v,d in edge_list])
                 for edge in edge_list:
