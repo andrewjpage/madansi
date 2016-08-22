@@ -96,7 +96,7 @@ class RefineContigNeighbours(object):
             
     def refine_contig_neighbours(self):
         """Removes the case when we have a short contig between two others."""
-        pprint.pprint(self.neighbouring_contigs)
+
         contig_max_iteration = self.setup_contig_max_iteration()
         for neighbours in sorted(self.neighbouring_contigs, key= lambda x: x[1]):
             if self.check_if_connection_is_valid(neighbours) != None:
@@ -127,7 +127,6 @@ class RefineContigNeighbours(object):
                             self.components_of_contigs[min_component_number].append(contig)
                             contig_max_iteration[contig][0] = min_component_number
                         self.components_of_contigs.pop(max_component_number)
-        pprint.pprint(self.refined_neighbouring_contigs)
         return self.refined_neighbouring_contigs
     
     
@@ -146,7 +145,6 @@ class RefineContigNeighbours(object):
     
     def remove_gene_degree_one(self, neighbours, contig_appearances, int, i):
         genes_degree_at_least_2 = []
-        #print(contig_appearances[neighbours[0][int]][1])
         for gene in contig_appearances[neighbours[0][int]][1][i]:
             if self.filtered_graph.degree(gene) != 1:
                 genes_degree_at_least_2.append(gene)
@@ -158,8 +156,6 @@ class RefineContigNeighbours(object):
         iteration_gene_dict = contig_appearances[neighbours[0][int]][1]
         iterations = sorted(iteration_gene_dict.keys())
         gene_objects = self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects
-        #print(neighbours[0][int])
-        #print(contig_appearances)
         genes_degree_at_least_2_first_iteration = self.remove_gene_degree_one(neighbours, contig_appearances, int, iterations[0])
         sequence_length = self.sequences[neighbours[0][int]][2]
         

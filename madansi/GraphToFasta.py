@@ -69,21 +69,18 @@ class GraphToFasta(object):
                     combined_contig = combined_contig + 'N'
             count += 1
         self.combined_contigs_dict[contig_count] = visited
-        print(self.combined_contigs_dict)
+        #print(self.combined_contigs_dict)
         return combined_contig
         
     def create_fasta_file_combined_contigs(self):
         f = open(self.output_fasta_fname, 'w')
         contig_count = 1
-        pprint.pprint(sorted(nx.connected_components(self.graph), key = len, reverse=True))
+        #pprint.pprint(sorted(nx.connected_components(self.graph), key = len, reverse=True))
         for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
-            print(component)
             combined_contig = self.combine_contigs(component, contig_count)
-            print('combined contigs')
             f.write('>Contig'+ str(contig_count) + '\n')
             f.write(combined_contig + '\n')
             contig_count += 1
-            print('added to count')
         pprint.pprint(self.combined_contigs_dict)
         f.close()
             

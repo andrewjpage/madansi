@@ -1,5 +1,4 @@
 from madansi.NeighboursOfNodes import NeighboursOfNodes
-import pprint
 
 class ContigSearching(object):
     """Given all the contigs present, this will expand out the region around each contig looking for intersections. Once these have been found we know how far two \
