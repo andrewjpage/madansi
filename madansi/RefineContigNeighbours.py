@@ -131,6 +131,7 @@ class RefineContigNeighbours(object):
     
     def remove_gene_degree_one(self, neighbours, contig_appearances, int, i):
         genes_degree_at_least_2 = []
+        print(contig_appearances[neighbours[0][int]][1])
         for gene in contig_appearances[neighbours[0][int]][1][i]:
             if self.filtered_graph.degree(gene) != 1:
                 genes_degree_at_least_2.append(gene)
@@ -142,49 +143,62 @@ class RefineContigNeighbours(object):
         iteration_gene_dict = contig_appearances[neighbours[0][int]][1]
         iterations = sorted(iteration_gene_dict.keys())
         gene_objects = self.gene_detector.contigs_to_genes()[neighbours[0][int]].gene_objects
+        print(neighbours[0][int])
+        print(contig_appearances)
         genes_degree_at_least_2_first_iteration = self.remove_gene_degree_one(neighbours, contig_appearances, int, iterations[0])
+        sequence_length = self.sequences[neighbours[0][int]][2]
         
-        
-        if len(genes_degree_at_least_2_first_iteration) == 1:
-            genes_degree_at_least_2_second_iteration = self.remove_gene_degree_one(neighbours, contig_appearances, int, iterations[1])
-            if len(genes_degree_at_least_2_second_iteration) == 1:
-                qry_starts.append(gene_objects[genes_degree_at_least_2_first_iteration[0]].qry_start)    
-                qry_starts.append(gene_objects[genes_degree_at_least_2_second_iteration[0]].qry_start)
-                return qry_starts
-            else:
-                if  all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start < \
-                        gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start \
-                        for i in range(len(iteration_gene_dict[iterations[1]]))) or \
-                    all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
-                        gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start \
-                        for i in range(len(iteration_gene_dict[iterations[1]]))):
-                            qry_starts.append(gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start)    
-                            qry_starts.append(gene_objects[iteration_gene_dict[iterations[1]][0]].qry_start)
-                            return qry_starts
+        if len(iterations) >= 2:
+            
+            if len(genes_degree_at_least_2_first_iteration) == 1:
+                print('here')
+                genes_degree_at_least_2_second_iteration = self.remove_gene_degree_one(neighbours, contig_appearances, int, iterations[1])
+                print(genes_degree_at_least_2_second_iteration)
+                if len(genes_degree_at_least_2_second_iteration) == 1:
+                    qry_starts.append(gene_objects[genes_degree_at_least_2_first_iteration[0]].qry_start)    
+                    qry_starts.append(gene_objects[genes_degree_at_least_2_second_iteration[0]].qry_start)
+                    return qry_starts
                 else:
-                    if gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start < sequence_length/2:
-                        return [1, sequence_length]
+                    if  all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start < \
+                            gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start \
+                            for i in range(len(iteration_gene_dict[iterations[1]]))) or \
+                        all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
+                            gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start \
+                            for i in range(len(iteration_gene_dict[iterations[1]]))):
+                                qry_starts.append(gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start)    
+                                qry_starts.append(gene_objects[iteration_gene_dict[iterations[1]][0]].qry_start)
+                                return qry_starts
                     else:
-                        return [sequence_length, 1]
-        else:
-            sequence_length = self.sequences[neighbours[0][int]][2]
-            if all(gene_objects[iteration_gene_dict[iterations[0]][i]].qry_start < \
-                    sequence_length/2 for i in range(len(iteration_gene_dict[iterations[0]]))):
-                    return [1, sequence_length]
-            elif all(gene_objects[iteration_gene_dict[iterations[0]][i]].qry_start >= \
-                    sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
-                    return [sequence_length, 1]
+                        if gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start < sequence_length/2:
+                            return [gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start, sequence_length]
+                        else:
+                            return [gene_objects[contig_appearances[neighbours[0][int]][1][iterations[0]][0]].qry_start, 1]
             else:
-                if len(iterations) > 1:
-                    if all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start < \
+                
+                if all(gene_objects[iteration_gene_dict[iterations[0]][i]].qry_start < \
+                        sequence_length/2 for i in range(len(iteration_gene_dict[iterations[0]]))):
+                        return [gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start, sequence_length]
+                elif all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
                         sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
-                        return [1, sequence_length]
-                    elif all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
-                        sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
-                        return [sequence_length, 1]
-                    else:
-                        return [None, None]
-    
+                        return [gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start, 1]
+                else:
+                    if len(iterations) > 1:
+                        if all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start < \
+                            sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
+                            return [gene_objects[iteration_gene_dict[iterations[1]][0]].qry_start, sequence_length]
+                        elif all(gene_objects[iteration_gene_dict[iterations[1]][i]].qry_start >= \
+                            sequence_length/2 for i in range(len(iteration_gene_dict[iterations[1]]))):
+                            return [gene_objects[iteration_gene_dict[iterations[1]][0]].qry_start, 1]
+                        else:
+                            return [None, None]
+        elif len(iterations) == 1:
+            if gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start < sequence_length/2:
+                return [gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start, sequence_length]
+            else:
+                return [gene_objects[iteration_gene_dict[iterations[0]][0]].qry_start, 1]            
+        else:
+            return [None, None]
+            
     
     
     

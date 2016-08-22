@@ -6,16 +6,13 @@ import sys
 
 class GraphToFasta(object):
     
-    def __init__(self,input_fasta_file, graph, output_fasta_fname, contig_ends):
-        self.input_fasta_file = input_fasta_file
+    def __init__(self, sequences, graph, output_fasta_fname, contig_ends):
         self.graph = graph
         self.output_fasta_fname = output_fasta_fname
         self.contig_ends = contig_ends
-        #pprint.pprint(contig_ends)
+        pprint.pprint(contig_ends)
         self.contig_orientation = {}
-        assembly = Assembly(self.input_fasta_file)
-        assembly.sequence_names()
-        self.sequences = assembly.sequences
+        self.sequences = sequences
         self.combined_contigs_dict = {}
         
     def contigs_degree_one(self, component):
@@ -61,26 +58,32 @@ class GraphToFasta(object):
         combined_contig = ''
         visited = self.walk_contig_graph(component)
         count = 1
+        
         for contig in visited:
             if self.contig_orientation[contig] == 1:
-                combined_contig += str(self.sequences[contig][0])
+                combined_contig = combined_contig + str(self.sequences[contig][0])
             else:
-                combined_contig += str(self.sequences[contig][1])
+                combined_contig = combined_contig + str(self.sequences[contig][1])
             if count != len(visited):
                 for i in range(200):
-                    combined_contig += 'N'
+                    combined_contig = combined_contig + 'N'
             count += 1
         self.combined_contigs_dict[contig_count] = visited
-        #pprint.pprint(self.combined_contigs_dict)
+        print(self.combined_contigs_dict)
         return combined_contig
         
     def create_fasta_file_combined_contigs(self):
         f = open(self.output_fasta_fname, 'w')
         contig_count = 1
+        pprint.pprint(sorted(nx.connected_components(self.graph), key = len, reverse=True))
         for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
+            print(component)
             combined_contig = self.combine_contigs(component, contig_count)
+            print('combined contigs')
             f.write('>Contig'+ str(contig_count) + '\n')
             f.write(combined_contig + '\n')
             contig_count += 1
+            print('added to count')
+        pprint.pprint(self.combined_contigs_dict)
         f.close()
             

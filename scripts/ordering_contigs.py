@@ -8,6 +8,7 @@ from madansi.GraphParser                    import GraphParser
 from madansi.FilterBlastComparison          import FilterBlastComparison
 from madansi.UnusedContigs                  import UnusedContigs
 from madansi.ProduceOrderedContigGraph      import ProduceOrderedContigGraph
+from madansi.IterateJoiningContigComponents import IterateJoiningContigComponents
 from madansi.GraphToFasta                   import GraphToFasta
 from madansi.RemoveContigs                  import RemoveContigs   
 
@@ -29,18 +30,22 @@ filtered_graph  = graph_parser.graph
 
 gene_detector   = GeneDetector(args.input_assembly_file, args.filtered_blast_hits_file)
 gene_detector.contigs_to_genes()
+gene_detector.assembly.sequence_names()
+sequences = gene_detector.assembly.sequences
 
 unused_contigs  = UnusedContigs(gene_detector, args.output_fasta_file, args.input_assembly_file )
 unused_contigs.contigs_not_in_filtered_file()
 
-produced_ordered_contig_graph   = ProduceOrderedContigGraph(gene_detector, filtered_graph, args.filtered_blast_hits_file, args.output_refined_contig_graph)
+produced_ordered_contig_graph   = ProduceOrderedContigGraph(gene_detector, filtered_graph, args.filtered_blast_hits_file, args.output_refined_contig_graph, sequences)
 ordered_contig_graph            = produced_ordered_contig_graph.produce_ordered_contig_graph()
 contig_ends                     = produced_ordered_contig_graph.contig_ends
 
 remove_contigs = RemoveContigs(ordered_contig_graph)
 ordered_contig_graph_filtered = remove_contigs.remove_extra_contigs()
+output_filtered_graph = IterateJoiningContigComponents(ordered_contig_graph_filtered, args.output_refined_contig_graph)
+output_filtered_graph.output_graph(ordered_contig_graph_filtered)
 
-graph_to_fasta = GraphToFasta(args.input_assembly_file, ordered_contig_graph_filtered, args.output_fasta_file, contig_ends)
+graph_to_fasta = GraphToFasta(sequences, ordered_contig_graph_filtered, args.output_fasta_file, contig_ends)
 graph_to_fasta.create_fasta_file_combined_contigs()
 
 unused_contigs.contigs_not_in_filtered_graph(ordered_contig_graph_filtered)
