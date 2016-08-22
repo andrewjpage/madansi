@@ -2,6 +2,7 @@
 
 import argparse
 import os
+from madansi.RunBLAST                       import RunBLAST
 from madansi.ContigSearching                import ContigSearching
 from madansi.GeneDetector                   import GeneDetector
 from madansi.GraphParser                    import GraphParser
@@ -14,6 +15,9 @@ from madansi.RemoveContigs                  import RemoveContigs
 
 parser = argparse.ArgumentParser(description =  'Script to take in the input assembly file, blast hits file and graph file and output a list of how each of the \
                                                 contigs are connected to each other and the number of iterations it takes to get between the two.')
+parser.add_argument('input_reference',              help ='path to the input reference fasta file',                                     type = str)
+parser.add_argument('output_reference',             help = 'path to the output reference fasta file with switched columns',             type = str)
+parser.add_argument('output_database',              help = 'path to the output database',                                               type = str)
 parser.add_argument('input_assembly_file',          help = 'Path to the input assembly file.',                                          type = str)
 parser.add_argument('blast_hits_file',              help = 'Path to the blast hits file.',                                              type = str)
 parser.add_argument('filtered_blast_hits_file',     help = 'Path to the output filtered blast hits file.',                              type = str)
@@ -21,6 +25,11 @@ parser.add_argument('input_graph_file',             help = 'Path to the input gr
 parser.add_argument('output_refined_contig_graph',  help = 'Path to the output refined contig graph file. This should be a dot file.',  type = str)
 parser.add_argument('output_fasta_file',            help = 'Path to the output fasta file with contigs grouped and orientated',         type = str)
 args = parser.parse_args()
+
+rb = RunBLAST(args.input_assembly_file, args.input_reference, args.output_reference, args.output_database, args.blast_hits_file)
+rb.run_switch_columns_database()
+rb.make_reference_database()
+rb.run_BLAST()
 
 filtered_blast_hits_file = FilterBlastComparison(args.blast_hits_file, args.filtered_blast_hits_file,  bit_score=200)
 filtered_blast_hits_file.filter()
