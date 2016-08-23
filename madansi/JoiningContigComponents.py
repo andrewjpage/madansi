@@ -33,10 +33,5 @@ class JoiningContigComponents(object):
                         
         return ordered_contig_graph
     
-    #def add_edges_degree_one(self):
-    #    ordered_contig_graph = self.add_edges()
-    #    for contig in self.unrefined_graph.nodes():
-    #        if  self.unrefined_graph.degree(contig) == 1:
-    #            ordered_contig_graph.add_edge(self.unrefined_graph.edges(contig)[0][0], self.unrefined_graph.edges(contig)[0][1])
-    #    return ordered_contig_graph
+
     
