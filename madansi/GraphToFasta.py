@@ -10,7 +10,6 @@ class GraphToFasta(object):
         self.graph = graph
         self.output_fasta_fname = output_fasta_fname
         self.contig_ends = contig_ends
-        pprint.pprint(contig_ends)
         self.contig_orientation = {}
         self.sequences = sequences
         self.combined_contigs_dict = {}
