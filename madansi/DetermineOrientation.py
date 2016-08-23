@@ -11,9 +11,9 @@ class DetermineOrientation(object):
         for neighbour in graph.neighbors(contig):
             if neighbour != previous_contig:
                 next_contig = neighbour
-        if contig_ends[contig][previous_contig][0] < sequences[contig][2]/2 and contig_ends[contig][next_contig][0] >= sequences[contig][2]/2:
+        if contig_ends[contig][previous_contig][0] <= sequences[contig][2]/2 and contig_ends[contig][next_contig][0] > sequences[contig][2]/2:
             return 1
-        elif contig_ends[contig][previous_contig][0] >= sequences[contig][2]/2 and contig_ends[contig][next_contig][0] < sequences[contig][2]/2:
+        elif contig_ends[contig][previous_contig][0] > sequences[contig][2]/2 and contig_ends[contig][next_contig][0] <= sequences[contig][2]/2:
             return -1
         elif contig_ends[contig][previous_contig][1] != None:
             if contig_ends[contig][previous_contig][1] > contig_ends[contig][previous_contig][0]:
