@@ -52,10 +52,12 @@ contig_ends                     = produced_ordered_contig_graph.contig_ends
 remove_contigs = RemoveContigs(ordered_contig_graph)
 ordered_contig_graph_filtered = remove_contigs.remove_extra_contigs()
 output_filtered_graph = IterateJoiningContigComponents(ordered_contig_graph_filtered, args.output_refined_contig_graph)
-output_filtered_graph.output_graph(ordered_contig_graph_filtered)
 
 graph_to_fasta = GraphToFasta(sequences, ordered_contig_graph_filtered, args.output_fasta_file, contig_ends)
 graph_to_fasta.create_fasta_file_combined_contigs()
 
 unused_contigs.contigs_not_in_filtered_graph(ordered_contig_graph_filtered)
 unused_contigs.add_unused_contigs_to_end()
+
+
+
