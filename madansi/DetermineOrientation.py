@@ -11,41 +11,38 @@ class DetermineOrientation(object):
         for neighbour in graph.neighbors(contig):
             if neighbour != previous_contig:
                 next_contig = neighbour
-        try:
-            if contig_ends[contig][previous_contig][0] <= contig_ends[contig][next_contig][0]:
+        if contig_ends[contig][previous_contig][0] < sequences[contig][2]/2 and contig_ends[contig][next_contig][0] >= sequences[contig][2]/2:
+            return 1
+        elif contig_ends[contig][previous_contig][0] >= sequences[contig][2]/2 and contig_ends[contig][next_contig][0] < sequences[contig][2]/2:
+            return -1
+        elif contig_ends[contig][previous_contig][1] != None:
+            if contig_ends[contig][previous_contig][1] > contig_ends[contig][previous_contig][0]:
                 return 1
             else:
                 return -1
-        except TypeError:
-            sys.exit()
-    
+        elif contig_ends[contig][next_contig][1] != None:
+            if contig_ends[contig][next_contig][1] > contig_ends[contig][next_contig][0]:
+                return -1
+            else:
+                return 1
+        elif contig_ends[contig][previous_contig][0] < contig_ends[contig][next_contig][0]:
+            return 1
+        else:
+            return -1      
+        
     def determine_orientation_start_contig(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
         neighbour = graph.neighbors(contig)
-        try:
-            if contig_ends[contig][neighbour[0]][0] >= contig_ends[contig][neighbour[0]][1]:
-                return 1
-            else:
-                return -1
-        except TypeError:
-            if contig_ends[contig][neighbour[0]][1] == None:
-                if contig_ends[contig][neighbour[0]][0] <= sequences[contig][2]/2:
-                    return -1
-                else:
-                    return 1
-            
+        if contig_ends[contig][neighbour[0]][0] < sequences[contig][2]/2:
+            return -1
+        else:
+            return 1
+                
     def determine_orientation_end_contig(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
         neighbour = graph.neighbors(contig)
-        try:
-            if contig_ends[contig][neighbour[0]][1] >= contig_ends[contig][neighbour[0]][0]:
-                return 1
-            else:
-                return -1
-        except TypeError:
-            if contig_ends[contig][neighbour[0]][1] == None:
-                if contig_ends[contig][neighbour[0]][0] <= sequences[contig][2]/2:
-                    return 1
-                else:
-                    return -1  
+        if contig_ends[contig][neighbour[0]][0] < sequences[contig][2]/2:
+            return 1
+        else:
+            return -1  
     
     def determine_orientation(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
         if len(graph.neighbors(contig)) == 2:
@@ -56,7 +53,7 @@ class DetermineOrientation(object):
 
     def determine_initial_direction_cycle(self,contig, contig_ends, visited,contig_orientation, graph, cycle, sequences):
         neighbours = graph.neighbors(contig)
-        if contig_ends[contig][neighbours[0]][0] >= contig_ends[contig][neighbours[1]][0]:
+        if contig_ends[contig][neighbours[0]][0] > contig_ends[contig][neighbours[1]][0]:
             next_neighbour = neighbours[0]
         else:
             next_neighbour = neighbours[1]
