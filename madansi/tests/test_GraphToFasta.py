@@ -20,7 +20,7 @@ class TestGraphToFasta(unittest.TestCase):
         graph = nx.Graph()
         graph.add_edges_from([('Contig1', 'Contig2'), ('Contig2', 'Contig3'), ('Contig3', 'Contig4')])
         contig_ends = {'Contig1':{'Contig2': (1,100)}, 'Contig2':{'Contig1':(29, 102), 'Contig3':(307, 240)}, 'Contig3':{'Contig2':(1000, 891), 'Contig4':(201, 401)}, 'Contig4':{'Contig3':(49, 300)}}
-        assembly = Assembly('madansi/tests/data/empty_file.fa')
+        assembly = Assembly('madansi/tests/data/assembly_4_sequences.fa')
         assembly.sequence_names()
         graph_to_fasta = GraphToFasta(assembly.sequences, graph, 'output.fa', contig_ends)
         self.assertEqual(['Contig1', 'Contig2', 'Contig3', 'Contig4'], graph_to_fasta.walk_contig_graph(['Contig1', 'Contig2', 'Contig3', 'Contig4']))
