@@ -12,10 +12,11 @@ setup(
 	url='https://github.com/JTumelty/madansi',
 	scripts=glob.glob('scripts/*'),
 	test_suite='nose.collector',
-	tests_require=['nose >= 1.3', 'mock'],
+	tests_require=['nose >= 1.3'],
     install_requires=[
-        'networkx'
-        'biopython']
+        'networkx',
+        'biopython'
+                ],
 	license='GPLv3',
 	classifiers=[
 	        "License :: OSI Approved :: GNU General Public License (GPLv3)",
