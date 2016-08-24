@@ -106,13 +106,13 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig4':{'Contig2':[5,50]}, 'Contig2':{'Contig4':[301,2]}})
         
     
-    def test_finding_contig_ends_4_cycle(self):
-        filtered_graph = nx.Graph()
-        filtered_graph.add_edges_from([('gene7', 'geneA'), ('geneA', 'geneB'), ('geneB', 'gene6'),\
-                                        ('gene6','geneC'), ('gene6', 'gene4'), ('gene4', 'gene5'),\
-                                        ('gene4', 'gene9'), ('gene9','geneC'), ('gene5', 'geneD')])
-        neighbouring_contigs = [[('Contig2', 'Contig3'), 1, ['gene6', 'gene9', 'gene4']]]
-        gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa','madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',1200]})
-        self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig3':{'Contig2':[250,1200]}, 'Contig2':{'Contig3':[301,2]}})                                        
+    #def test_finding_contig_ends_4_cycle(self):
+    #    filtered_graph = nx.Graph()
+    #    filtered_graph.add_edges_from([('gene7', 'geneA'), ('geneA', 'geneB'), ('geneB', 'gene6'),\
+    #                                    ('gene6','geneC'), ('gene6', 'gene4'), ('gene4', 'gene5'),\
+    #                                    ('gene4', 'gene9'), ('gene9','geneC'), ('gene5', 'geneD')])
+    #    neighbouring_contigs = [[('Contig2', 'Contig3'), 1, ['gene6', 'gene9', 'gene4']]]
+    #    gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa','madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
+    #    refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',1200]})
+    #    self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig3':{'Contig2':[250,1200]}, 'Contig2':{'Contig3':[301,2]}})                                        
     

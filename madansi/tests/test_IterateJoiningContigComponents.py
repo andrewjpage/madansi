@@ -6,7 +6,7 @@ class TestIterateJoiningContigComponents(unittest.TestCase):
     
     def test_empty_graph(self):
         """Tests when both the unrefined and refined graphs are empty"""
-        test_case = IterateJoiningContigComponents(nx.Graph(),'')
+        test_case = IterateJoiningContigComponents(nx.Graph())
         ordered_contig_graph = test_case.iterate_joining(nx.Graph())
         self.assertTrue(nx.is_isomorphic(nx.Graph(), ordered_contig_graph))
     
@@ -14,7 +14,7 @@ class TestIterateJoiningContigComponents(unittest.TestCase):
         """Tests when the refined graph is initially empty but the unrefined graph is not"""
         unrefined_graph = nx.Graph()
         unrefined_graph.add_edge('contig1', 'contig2')
-        test_case = IterateJoiningContigComponents(unrefined_graph, '')
+        test_case = IterateJoiningContigComponents(unrefined_graph)
         ordered_contig_graph = test_case.iterate_joining(nx.Graph())
         self.assertTrue(nx.is_isomorphic(nx.Graph(), ordered_contig_graph))
     
@@ -25,7 +25,7 @@ class TestIterateJoiningContigComponents(unittest.TestCase):
         initial_refined_graph = nx.Graph()
         initial_refined_graph.add_edge('contig1', 'contig2')
         
-        test_case = IterateJoiningContigComponents(unrefined_graph, '')
+        test_case = IterateJoiningContigComponents(unrefined_graph)
         ordered_contig_graph = test_case.iterate_joining(initial_refined_graph)
         self.assertTrue(nx.is_isomorphic(ordered_contig_graph, unrefined_graph))
     
@@ -37,7 +37,7 @@ class TestIterateJoiningContigComponents(unittest.TestCase):
         initial_refined_graph = nx.Graph()
         initial_refined_graph.add_edge('contig1', 'contig2')
         
-        test_case = IterateJoiningContigComponents(unrefined_graph, '')
+        test_case = IterateJoiningContigComponents(unrefined_graph)
         ordered_contig_graph = test_case.iterate_joining(initial_refined_graph)
         self.assertTrue(nx.is_isomorphic(ordered_contig_graph, unrefined_graph))
     
@@ -57,9 +57,8 @@ class TestIterateJoiningContigComponents(unittest.TestCase):
         final_refined_graph.add_edges_from([('contig1','contig2'), ('contig2', 'contig3'),\
                                             ('contig3','contig4'), ('contig4', 'contig6')])
         
-        test_case = IterateJoiningContigComponents(unrefined_graph, '')
+        test_case = IterateJoiningContigComponents(unrefined_graph)
         ordered_contig_graph = test_case.iterate_joining(initial_refined_graph)
-        print(ordered_contig_graph.edges())
         self.assertTrue(nx.is_isomorphic(ordered_contig_graph, final_refined_graph))
         
         

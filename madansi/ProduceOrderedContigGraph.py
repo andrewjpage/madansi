@@ -5,11 +5,10 @@ from madansi.IterateJoiningContigComponents     import IterateJoiningContigCompo
 
 class ProduceOrderedContigGraph(object):
     
-    def __init__(self, gene_detector, filtered_graph, filtered_blast_hits_file, output_refined_contig_graph, sequences):
+    def __init__(self, gene_detector, filtered_graph, filtered_blast_hits_file, sequences):
         self.gene_detector                  = gene_detector
         self.filtered_graph                 = filtered_graph
         self.filtered_blast_hits_file       = filtered_blast_hits_file
-        self.output_refined_contig_graph    = output_refined_contig_graph
         self.contig_ends                    = {}
         self.sequences                      = sequences
     
@@ -27,7 +26,6 @@ class ProduceOrderedContigGraph(object):
         graph_refined           = contig_graph_refined.create_contig_subgraph()
         graph_unrefined         = contig_graph_unrefined.create_contig_subgraph()
         
-        iterate_joining_contig_components   = IterateJoiningContigComponents(graph_unrefined, self.output_refined_contig_graph)
+        iterate_joining_contig_components   = IterateJoiningContigComponents(graph_unrefined)
         ordered_contig_graph                = iterate_joining_contig_components.iterate_joining(graph_refined)
-        iterate_joining_contig_components.output_graph(ordered_contig_graph)
         return ordered_contig_graph

@@ -1,10 +1,11 @@
 from madansi.BlastHit import BlastHit, file_reader, Error
+import tempfile
 
 class FilterBlastComparison(object):
     """Filter output of BLAST comparison"""
-    def __init__(self, input_blast_file, filtered_file, percent_identity=0.0, alignment_length=0, mismatches=10000, gap_openings=10, evalue=10, bit_score=0):
+    def __init__(self, input_blast_file,temp_dir, percent_identity=0.0, alignment_length=0, mismatches=10000, gap_openings=10, evalue=10, bit_score=0):
         self.input_blast_file = input_blast_file
-        self.filtered_file = filtered_file
+        self.filtered_blast_output = tempfile.NamedTemporaryFile(delete = False, dir= temp_dir)
         try:
             self.percent_identity = float(percent_identity)
         except percentidentity > 100 or percent_identity < 0:
@@ -47,7 +48,7 @@ class FilterBlastComparison(object):
         except IOError:
             raise Error('Error opening this file')
         
-        filtered_output = open(self.filtered_file, 'w')
+        filtered_output = open(self.filtered_blast_output.name, 'w')
         gene_duplicates = self.find_gene_duplicates()
         
         for line in f:

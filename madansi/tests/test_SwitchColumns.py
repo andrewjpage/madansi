@@ -1,6 +1,7 @@
 import unittest
 from madansi.SwitchColumns import SwitchColumns
 import filecmp
+import tempfile
 import os
 
 class TestSwitchColumns(unittest.TestCase):
@@ -11,11 +12,8 @@ class TestSwitchColumns(unittest.TestCase):
         self.assertTrue(sw.output_file)
     
     def test_switching_around_columns(self):
-        sw = SwitchColumns('madansi/tests/data/input_reference.fa','output_file')
+        output_file = tempfile.NamedTemporaryFile(delete = False)
+        sw = SwitchColumns('madansi/tests/data/input_reference.fa',output_file.name)
         sw.run()
-        self.assertTrue(filecmp.cmp('output_file','madansi/tests/data/expected_output_reference.fa', shallow=False))
-        self.clean_up()
-    
-    def clean_up(self):
-        if os.path.exists('output_file'):
-                os.remove('output_file')
+        self.assertTrue(filecmp.cmp(output_file.name,'madansi/tests/data/expected_output_reference.fa', shallow=False))
+        os.unlink(output_file.name)
