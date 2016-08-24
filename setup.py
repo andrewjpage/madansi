@@ -14,7 +14,7 @@ setup(
 	test_suite='nose.collector',
 	tests_require=['nose >= 1.3'],
     install_requires=[
-        'networkx',
+        'networkx >= 1.11',
         'biopython'
                 ],
 	license='GPLv3',
