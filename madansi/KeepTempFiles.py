@@ -13,6 +13,9 @@ class KeepTempFiles(object):
     def create_new_directory(self):
         if self.output_directory != None:
             os.mkdir(self.output_directory)
+    
+    def move_all_files(self):
+        if self.output_directory != None:
             self.move_and_rename_reference()
             self.move_and_rename_database()
             self.move_and_rename_blast_output()
