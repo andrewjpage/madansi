@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 setup(
 	name= 'madansi',
 	version= '1.0.1',
-	description= '',
+	description= 'Reorders and orientates contigs from a fasta file using a pan genome graph.',
 	packages = find_packages(),
 	author = 'Joanna Tumelty',
 	author_email= 'jt20@sanger.ac.uk',
