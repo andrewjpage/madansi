@@ -15,8 +15,8 @@ from madansi.GraphToFasta                   import GraphToFasta
 from madansi.RemoveContigs                  import RemoveContigs  
 from madansi.KeepTempFiles                  import KeepTempFiles 
 
-parser = argparse.ArgumentParser(description =  'Script to take in the input assembly file, blast hits file and graph file and output a list of how each of the \
-                                                contigs are connected to each other and the number of iterations it takes to get between the two.')
+parser = argparse.ArgumentParser(description =  'Script to take in the input pan genome reference file, assembly fasta file and graph giving genes in the pangenome \
+                                                and outputs a fasta file with the contigs in the assembly file reordered and reorientated')
 #Required
 parser.add_argument('input_reference',          help ='path to the input reference fasta file',                                     type = str)
 parser.add_argument('input_fasta_file',         help = 'Path to the input assembly file.',                                          type = str)
