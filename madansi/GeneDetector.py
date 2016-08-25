@@ -1,7 +1,6 @@
 from madansi.Contig import Contig
 from madansi.Assembly import Assembly
-import os
-from madansi.BlastHit import file_reader, BlastHit
+from madansi.BlastHit import file_reader
 
 class GeneDetector(object):
     """An object that has all the contigs present as well as the genes within each contig and their information"""

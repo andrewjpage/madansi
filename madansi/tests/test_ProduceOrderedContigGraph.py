@@ -1,6 +1,5 @@
 import networkx as nx
 import unittest
-import os
 from madansi.GeneDetector import GeneDetector
 from madansi.ProduceOrderedContigGraph import ProduceOrderedContigGraph
 

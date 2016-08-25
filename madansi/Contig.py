@@ -1,4 +1,3 @@
-from madansi.BlastHit import BlastHit
 from madansi.Gene import Gene
 
 class Contig(object):

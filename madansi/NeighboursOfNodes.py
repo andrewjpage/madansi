@@ -1,5 +1,3 @@
-import networkx as nx
-
 class NeighboursOfNodes(object): 
     """Given a list of nodes in the graph it will find the nighbours of this set"""
     def __init__(self,graph):

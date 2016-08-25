@@ -1,8 +1,6 @@
 import unittest
 from madansi.ContigGraph import ContigGraph
-import os
 import networkx as nx
-import filecmp
 
 class TestContigGraph(unittest.TestCase):
 	

@@ -1,8 +1,5 @@
 import networkx as nx
-from madansi.Assembly import Assembly
 from madansi.DetermineOrientation import DetermineOrientation
-import pprint
-import sys
 
 class GraphToFasta(object):
     
@@ -68,18 +65,15 @@ class GraphToFasta(object):
                     combined_contig = combined_contig + 'N'
             count += 1
         self.combined_contigs_dict[contig_count] = visited
-        #print(self.combined_contigs_dict)
         return combined_contig
         
     def create_fasta_file_combined_contigs(self):
         f = open(self.output_fasta_fname, 'w')
         contig_count = 1
-        #pprint.pprint(sorted(nx.connected_components(self.graph), key = len, reverse=True))
         for component in sorted(nx.connected_components(self.graph), key = len, reverse=True):
             combined_contig = self.combine_contigs(component, contig_count)
             f.write('>Contig'+ str(contig_count) + '\n')
             f.write(combined_contig + '\n')
             contig_count += 1
-        pprint.pprint(self.combined_contigs_dict)
         f.close()
             

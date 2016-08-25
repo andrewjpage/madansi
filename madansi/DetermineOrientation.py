@@ -1,7 +1,3 @@
-import networkx as nx
-from madansi.Assembly import Assembly
-import sys
-
 class DetermineOrientation(object):
     def __init__(self):
         pass

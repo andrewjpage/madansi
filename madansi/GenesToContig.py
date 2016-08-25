@@ -1,4 +1,4 @@
-from madansi.BlastHit import file_reader, BlastHit
+from madansi.BlastHit import file_reader
 class GenesToContig(object):
     
     def __init__(self, filtered_blast_file):

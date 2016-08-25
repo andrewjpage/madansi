@@ -1,4 +1,4 @@
-from madansi.BlastHit import BlastHit, file_reader, Error
+from madansi.BlastHit import BlastHit, Error
 import tempfile
 
 class FilterBlastComparison(object):
@@ -8,7 +8,7 @@ class FilterBlastComparison(object):
         self.filtered_blast_output = tempfile.NamedTemporaryFile(delete = False, dir= temp_dir)
         try:
             self.percent_identity = float(percent_identity)
-        except percentidentity > 100 or percent_identity < 0:
+        except percent_identity > 100 or percent_identity < 0:
             raise ValueError("Percent identity should be a float or int between 0 and 100")
         self.percent_identity = float(percent_identity)
         self.alignment_length = int(alignment_length)

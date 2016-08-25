@@ -13,10 +13,6 @@ class TestConnectedComponents(unittest.TestCase):
     def test_component_dictionary(self): #May want to change the asserts equal to look at objects
         test_graph = nx.Graph(nx.drawing.nx_pydot.read_dot('madansi/tests/data/connected_component_graph.dot'))
         components = ConnectedComponents(test_graph , '')
-        contig_component_1 = Component(0, sorted(['contig4', 'contig5', 'contig6', 'contig7']), sorted(['contig4', 'contig7']),\
-                                         sorted([('contig4', 'contig5'), ('contig5', 'contig6'), ('contig6', 'contig7')]))
-        contig_component_2 = Component(1, sorted(['contig2', 'contig3']), sorted(['contig2', 'contig3']), [('contig2', 'contig3')])
-        contig_component_3 = Component(2, ['contig1'], ['contig1'], [])
         component_dictionary = components.create_component_dictionary()
         self.assertEqual(sorted(component_dictionary.keys()), sorted([0,1,2]))
         self.assertEqual(sorted(component_dictionary[0].contigs), sorted(['contig4', 'contig5', 'contig6', 'contig7']) )

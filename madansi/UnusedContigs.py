@@ -1,4 +1,3 @@
-import networkx as nx
 from madansi.Assembly import Assembly
 
 class UnusedContigs(object):

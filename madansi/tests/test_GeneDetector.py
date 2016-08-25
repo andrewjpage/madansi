@@ -1,6 +1,5 @@
 import unittest
 from madansi.GeneDetector import GeneDetector
-from madansi.Contig import Contig
 from madansi.BlastHit import BlastHit
 from madansi.Gene import Gene
 

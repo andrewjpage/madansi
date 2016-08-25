@@ -55,6 +55,6 @@ class TestFilterBlastComparison(unittest.TestCase):
     def tests_invalid_percentage_identity(self):
         """Tests a percentage identity outside the valid range"""
         os.mkdir('tmp_dir')
-        fbc = FilterBlastComparison('madansi/tests/data/blast_unittest.m8', 'tmp_dir', percent_identity=103.0)
+        FilterBlastComparison('madansi/tests/data/blast_unittest.m8', 'tmp_dir', percent_identity=103.0)
         self.assertRaises(ValueError)
         shutil.rmtree('tmp_dir')

@@ -1,5 +1,3 @@
-import networkx as nx
-
 class RemoveContigs(object):
     def __init__(self, graph):
         self.graph = graph

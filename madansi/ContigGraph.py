@@ -1,5 +1,4 @@
 import networkx as nx
-import pprint
 
 class ContigGraph(object):
     """Given a list of tuples of pairs of contigs together with the distance between them, will generate a weighted graph showing all\

@@ -1,8 +1,5 @@
-import networkx as nx
-import pprint
 from madansi.GenesToContig import GenesToContig
 from madansi.NeighboursOfNodes import NeighboursOfNodes
-import sys
 
 class RefineContigNeighbours(object):
     
@@ -31,11 +28,6 @@ class RefineContigNeighbours(object):
                 else:
                     contig_appearances[self.genes[gene]][1][iteration] = [gene]
         return contig_appearances
-    
-    #def count_contig_appearances(self, gene_list, contig_appearances):
-    #    for gene in gene_list:
-    #        contig_appearances = self.add_to_contig_appearance(gene, contig_appearances)
-    #    return contig_appearances
     
     def find_contig_appearances(self, neighbours):
         seen_nodes = []
