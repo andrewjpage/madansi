@@ -40,5 +40,5 @@ class KeepTempFiles(object):
     
     def move_and_rename_output_fasta_file(self):
         base_name = os.path.basename(self.output_fasta_file)
-        os.rename(self.output_fasta_file, self.output_directory+'/output_fasta_file')
+        os.rename(self.output_fasta_file, self.output_directory+'/'+ base_name)
         
