@@ -1,7 +1,0 @@
-strict digraph "" {
-gene12 [Present=True, Sequence=Sequence1];
-gene1 [Present=True, Sequence=Sequence1];
-gene5 [Present=False, Sequence=Sequence1];
-gene1 -- gene5;
-gene5 -- gene12;
-}

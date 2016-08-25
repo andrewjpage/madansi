@@ -1,7 +1,0 @@
-strict graph "" {
-gene4;
-gene1;
-gene11;
-gene4 -- gene1;
-gene1 -- gene11;
-}
