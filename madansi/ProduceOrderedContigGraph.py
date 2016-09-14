@@ -18,9 +18,9 @@ class ProduceOrderedContigGraph(object):
         contig_searching.expand_all_contigs()
      
         refine_neighbouring_contigs = RefineContigNeighbours(contig_searching.neighbouring_contigs, self.filtered_graph, self.unfiltered_graph, self.filtered_blast_hits_file, self.gene_detector, self.sequences)
-	    refine_neighbouring_contigs.refine_contig_neighbours()        
+        refine_neighbouring_contigs.refine_contig_neighbours()        
         self.contig_ends            = refine_neighbouring_contigs.ends_of_contigs()
-	    refined_neighbouring_contigs= refine_neighbouring_contigs.refined_neighbouring_contigs
+        refined_neighbouring_contigs= refine_neighbouring_contigs.refined_neighbouring_contigs
         
         contig_graph_refined    = ContigGraph(refined_neighbouring_contigs)
         contig_graph_unrefined  = ContigGraph(contig_searching.neighbouring_contigs)
