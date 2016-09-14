@@ -11,10 +11,12 @@ class GraphParser(object):
         for node in graph.nodes_iter():
             if graph.degree(node) >= 4:
                 edge_list = graph.edges(node, data=True)
+                min_weight = min([d['weight'] for u,v,d in edge_list])
                 max_weight = max([d['weight'] for u,v,d in edge_list])
                 for edge in edge_list:
                     if edge[2]['weight'] == max_weight:
-                        edges_to_remove.append(edge)
+                        if max_weight != min_weight:
+                            edges_to_remove.append(edge)
         graph.remove_edges_from(edges_to_remove)
         return graph
 

@@ -23,8 +23,6 @@ class ContigOrientation(object):
         visited_contigs = [contig]
         queue = [contig]
         while sorted(visited_contigs) != sorted(contig_list):
-            print(visited_contigs)
-            print(queue)
             contig = queue[0]
             for neighbour in self.contig_graph.neighbors(contig):
                 if neighbour not in visited_contigs and neighbour not in queue:
