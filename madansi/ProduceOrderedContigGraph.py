@@ -30,4 +30,4 @@ class ProduceOrderedContigGraph(object):
         iterate_joining_contig_components   = IterateJoiningContigComponents(graph_unrefined)
         ordered_contig_graph                = iterate_joining_contig_components.iterate_joining(graph_refined)
         
-	return ordered_contig_graph
+        return ordered_contig_graph
