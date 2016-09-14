@@ -24,7 +24,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         filtered_graph = nx.Graph()
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
         neighbouring_contigs = []
-        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph,filtered_graph, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
+        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
         self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {}, 0), {'Contig1':[1,{0:['gene1']}]})
         self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[0, {}]}, 1), {'Contig1':[1,{1:['gene1']}]})
         self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[1, {0:['gene2']}]}, 1), {'Contig1':[2,{0:['gene2'], 1:['gene1']}]})
