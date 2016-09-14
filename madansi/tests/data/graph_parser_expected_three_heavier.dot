@@ -6,10 +6,11 @@ gene4;
 gene5;
 gene6;
 gene7;
-gene2 -- gene3;
+gene2 -- gene3 [weight="1"];
 gene3 -- gene1 [weight="0.5"];
-gene4 -- gene5;
-gene2 -- gene6;
-gene6 -- gene7;
-gene1 -- gene5;
+gene3 -- gene5 [weight="2"];
+gene4 -- gene5 [weight="1"];
+gene2 -- gene6 [weight="2"];
+gene6 -- gene7 [weight="0.3"];
+gene1 -- gene5 [weight="0.7"];
 }
