@@ -26,5 +26,4 @@ class RunBLAST(object):
     def run_BLAST(self):
         """Run BLAST with the query file and the modified reference fasta file"""
         blastn_cline = NcbiblastnCommandline(query = self.query, db= self.output_database.name, outfmt=6, out=self.blast_output.name, task ='blastn', evalue= self.evalue)
-        print(tempfile.gettempprefix())
         stdout, stderr = blastn_cline()

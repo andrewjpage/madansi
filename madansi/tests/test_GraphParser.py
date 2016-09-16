@@ -2,7 +2,7 @@ import unittest
 from madansi.GraphParser import GraphParser
 import networkx as nx
 
-class TestGraphParse(unittest.TestCase):
+class TestGraphParser(unittest.TestCase):
     
     def test_initialisation(self):
         graph_parser = GraphParser('madansi/tests/data/test_graph.dot')

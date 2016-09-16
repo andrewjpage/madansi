@@ -11,7 +11,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                         ('geneA', 'geneB'), ('geneB', 'gene4'), ('gene4', 'gene5')])
         neighbouring_contigs = [[('Contig1', 'Contig2'), 2, ['geneA', 'geneB']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector,{'Contig1':['','',1000], 'Contig2':['', '', 800]})
+        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector,{'Contig1':['','',1000], 'Contig2':['', '', 800]})
         refine_contig_neighbours_object.contigs = { 'Contig1':{'gene1':None, 'gene2':None, 'gene3':None},\
                                                     'Contig2':{'gene4':None, 'gene5':None}}                      
         refine_contig_neighbours_object.genes = {   'gene1':'Contig1', 'gene2':'Contig1', 'gene3':'Contig1',\
@@ -24,7 +24,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         filtered_graph = nx.Graph()
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
         neighbouring_contigs = []
-        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
+        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
         self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {}, 0), {'Contig1':[1,{0:['gene1']}]})
         self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[0, {}]}, 1), {'Contig1':[1,{1:['gene1']}]})
         self.assertDictEqual(refine_contig_neighbours_object.add_to_contig_appearance('gene1', {'Contig1':[1, {0:['gene2']}]}, 1), {'Contig1':[2,{0:['gene2'], 1:['gene1']}]})
@@ -35,7 +35,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         filtered_graph.add_edges_from([ ('gene9', 'gene8'), ('gene8', 'gene7'), ('gene7', 'gene6'), ('gene7', 'gene4'), ('gene4', 'gene5')])
         neighbouring_contigs = [[('Contig3', 'Contig2'),1, ['gene7', 'gene4']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',2000]})
+        refine_contig_neighbours_object = RefineContigNeighbours(neighbouring_contigs, filtered_graph, filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',2000]})
         self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig3':{'Contig2':[250,700]}, 'Contig2':{'Contig3':[2,301]}})
         
         
@@ -46,7 +46,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                         ('gene7', 'gene8')])           
         neighbouring_contigs = [[('Contig1', 'Contig2'),1, ['gene3','gene4']], [('Contig2', 'Contig3'),1,['gene5','gene6']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file' )
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
+        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph, filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
         refine_contig_neighbours_object.genes = {   'gene1':'Contig1', 'gene2':'Contig1', 'gene3':'Contig1',\
                                                     'gene4':'Contig2', 'gene5':'Contig2', 'gene6':'Contig3', \
                                                     'gene7':'Contig3', 'gene8':'Contig3'}
@@ -61,7 +61,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                         ('gene7', 'gene8')])
         neighbouring_contigs = [[('Contig1', 'Contig2'),1, ['geneA','geneB']], [('Contig2', 'Contig3'),1,['geneC']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file' )
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
+        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,filtered_graph, 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800], 'Contig3':['','',2000]})
         refine_contig_neighbours_object.genes = {   'gene1':'Contig1', 'gene2':'Contig1', 'gene3':'Contig1',\
                                                     'gene4':'Contig2', 'gene5':'Contig2', 'gene6':'Contig3', \
                                                     'gene7':'Contig3', 'gene8':'Contig3', 'geneA':None, 'geneB':None, 'geneC':None}
@@ -74,7 +74,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                         ('geneA', 'gene6'), ('gene6', 'gene8'), ('gene6', 'gene7')])                                          
         neighbouring_contigs = [[('Contig2', 'Contig3'),1,['geneA']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa','madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',2000]})
+        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',2000]})
         self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig3':{'Contig2':[1,2000]}, 'Contig2':{'Contig3':[301,2]}})                                            
         
     
@@ -83,7 +83,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         filtered_graph.add_edges_from([ ('gene1', 'gene2'), ('gene3', 'gene2'), ('gene3', 'gene4'), ('gene4', 'gene5')])
         neighbouring_contigs = [[('Contig1', 'Contig2'),1,['gene3', 'gene4']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa', 'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800]})                                            
+        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph, filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig1':['','',1000], 'Contig2':['', '', 800]})                                            
         refine_contig_neighbours_object.ends_of_contigs()
         self.assertTrue(refine_contig_neighbours_object.contig_ends == {'Contig1':{'Contig2':[980,3]}, 'Contig2':{'Contig1':[2,301]}} or \
                         refine_contig_neighbours_object.contig_ends == {'Contig1':{'Contig2':[980,490]}, 'Contig2':{'Contig1':[2,301]}})
@@ -94,7 +94,7 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
                                         ('geneA', 'gene6'), ('gene6', 'gene8'), ('gene6', 'gene7')])                                          
         neighbouring_contigs = [[('Contig2', 'Contig3'),1,['geneA']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa','madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',1200]})
+        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph, filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',1200]})
         self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig3':{'Contig2':[250,1200]}, 'Contig2':{'Contig3':[301,2]}})
     
     def test_one_gene_on_contig(self):
@@ -102,17 +102,8 @@ class TestRefineContigNeighboursOrientation(unittest.TestCase):
         filtered_graph.add_edges_from([('gene4', 'gene5'), ('gene5', 'gene10'), ('gene10', 'geneA')])
         neighbouring_contigs = [[('Contig2', 'Contig4'), 1, ['gene5', 'gene10']]]
         gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa','madansi/tests/data/refine_contig_neighbours_10_blast_hits_file')
-        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_10_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig4':['','',50]})
+        refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,filtered_graph,'madansi/tests/data/refine_contig_neighbours_10_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig4':['','',50]})
         self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig4':{'Contig2':[5,50]}, 'Contig2':{'Contig4':[301,2]}})
         
-    
-    #def test_finding_contig_ends_4_cycle(self):
-    #    filtered_graph = nx.Graph()
-    #    filtered_graph.add_edges_from([('gene7', 'geneA'), ('geneA', 'geneB'), ('geneB', 'gene6'),\
-    #                                    ('gene6','geneC'), ('gene6', 'gene4'), ('gene4', 'gene5'),\
-    #                                    ('gene4', 'gene9'), ('gene9','geneC'), ('gene5', 'geneD')])
-    #    neighbouring_contigs = [[('Contig2', 'Contig3'), 1, ['gene6', 'gene9', 'gene4']]]
-    #    gene_detector = GeneDetector('madansi/tests/data/assembly_4_sequences.fa','madansi/tests/data/refine_contig_neighbours_9_blast_hits_file')
-    #    refine_contig_neighbours_object =  RefineContigNeighbours(neighbouring_contigs,filtered_graph,'madansi/tests/data/refine_contig_neighbours_9_blast_hits_file', gene_detector, {'Contig2':['','',800], 'Contig3':['','',1200]})
-    #    self.assertDictEqual(refine_contig_neighbours_object.ends_of_contigs(), {'Contig3':{'Contig2':[250,1200]}, 'Contig2':{'Contig3':[301,2]}})                                        
+                                   
     

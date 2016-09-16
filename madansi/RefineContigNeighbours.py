@@ -3,9 +3,10 @@ from madansi.NeighboursOfNodes import NeighboursOfNodes
 
 class RefineContigNeighbours(object):
     
-    def __init__(self, neighbouring_contigs, filtered_graph, filtered_blast_file, gene_detector, sequences):
+    def __init__(self, neighbouring_contigs, filtered_graph, unfiltered_graph, filtered_blast_file, gene_detector, sequences):
         self.neighbouring_contigs           = neighbouring_contigs
-        self.filtered_graph                 = filtered_graph
+        self.filtered_graph = filtered_graph
+        self.unfiltered_graph               = unfiltered_graph
         self.filtered_blast_file            = filtered_blast_file
         self.genes                          = GenesToContig(self.filtered_blast_file).genes_to_contig()
         self.refined_neighbouring_contigs   = []
@@ -37,8 +38,8 @@ class RefineContigNeighbours(object):
             seen_nodes.append(intersection)
             self.add_to_contig_appearance(intersection, contig_appearances,0)
             
-        for i in range(neighbours[1] + 2):
-            neighbouring_nodes = NeighboursOfNodes(self.filtered_graph).find_neighbours(seen_nodes)
+        for i in range(neighbours[1] + 3):
+            neighbouring_nodes = NeighboursOfNodes(self.unfiltered_graph).find_neighbours(seen_nodes)
             
             for neighbour_node in neighbouring_nodes:
                 seen_nodes.append(neighbour_node)
@@ -76,14 +77,14 @@ class RefineContigNeighbours(object):
         """Only keeps the cases where there is not a gene by itself or too many genes, coming from an intersection towards the middle of the contig"""
         contig_appearances = self.find_contig_appearances(neighbours)
         most_occurent_contig = self.most_occurent_contig(contig_appearances, neighbours)
-        
+
         if  contig_appearances[neighbours[0][0]][0] in range(min(2, len(self.gene_detector.contigs_to_genes()[neighbours[0][0]].gene_objects)), neighbours[1] + 4) and\
                          contig_appearances[neighbours[0][1]][0] in range(min(2, len(self.gene_detector.contigs_to_genes()[neighbours[0][1]].gene_objects)), neighbours[1] + 4) and\
                          most_occurent_contig in [neighbours[0][0], neighbours[0][1]]:
             if len(contig_appearances) == 2:
                 return neighbours
             else:
-                if self.check_for_small_contig(0,neighbours,contig_appearances) or self.check_for_small_contig(1,neighbours,contig_appearances):
+                if self.check_for_small_contig(0,neighbours,contig_appearances) or self.check_for_small_contig(1,neighbours,contig_appearances) and len(contig_appearances) ==3:
                     return neighbours
             
     def refine_contig_neighbours(self):
@@ -138,7 +139,7 @@ class RefineContigNeighbours(object):
     def remove_gene_degree_one(self, neighbours, contig_appearances, int, i):
         genes_degree_at_least_2 = []
         for gene in contig_appearances[neighbours[0][int]][1][i]:
-            if self.filtered_graph.degree(gene) != 1:
+            if self.unfiltered_graph.degree(gene) != 1:
                 genes_degree_at_least_2.append(gene)
         return genes_degree_at_least_2
                         
